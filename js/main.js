@@ -1,11 +1,12 @@
 // main.js — 장면 조립, 젤리 스프링, 입력, 조작 패널
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { buildTerrain, heightAt, HX, HZ, BOTTOM, mix } from './terrain.js';
+import { buildTerrain, heightAt, coastZ, HX, HZ, BOTTOM, mix } from './terrain.js';
 import { Water, Spray } from './water.js';
 import { buildWorld } from './world.js';
 import { buildLife } from './life.js';
 import { createAudio } from './audio.js';
+import { setupLearning } from './learn.js';
 
 const $ = s => document.querySelector(s);
 const canvas = $('#c');
@@ -201,6 +202,7 @@ const title = $('#title');
 
 // ── 이름표
 const labelBox = $('#labels');
+world.labels.push({ name: '갯벌', pos: new THREE.Vector3(-11.2, 0.55, coastZ(-11.2) + 1.2) });
 const labels = world.labels.map(l => { const el = document.createElement('div'); el.className = 'pill'; el.textContent = l.name; labelBox.appendChild(el); return { ...l, el }; });
 let showLabels = true;
 function updLabels() {
@@ -209,7 +211,8 @@ function updLabels() {
     P.copy(l.pos).applyMatrix4(root.matrixWorld).project(camera);
     const x = (P.x * 0.5 + 0.5) * layout.W, y = (-P.y * 0.5 + 0.5) * layout.H;
     l.el.style.transform = `translate(-50%,-100%) translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
-    l.el.style.opacity = P.z < 1 && x > 20 && x < layout.W - 20 && y > 20 && y < layout.H - 10 ? 1 : 0;
+    const vis = P.z < 1 && x > 20 && x < layout.W - 20 && y > 20 && y < layout.H - 10;
+    l.el.style.opacity = vis ? 1 : 0; l.el.style.pointerEvents = vis ? '' : 'none';
   }
 }
 
@@ -250,9 +253,15 @@ $('#bReset').onclick = () => {
 };
 $('#bPause').onclick = e => { paused = !paused; e.currentTarget.classList.toggle('on', paused); e.currentTarget.textContent = paused ? '계속' : '멈춤'; };
 $('#bSound').onclick = e => { audio.init(); audio.setMuted(!audio.muted); e.currentTarget.classList.toggle('off', audio.muted); e.currentTarget.textContent = audio.muted ? '소리 꺼짐' : '소리'; };
-$('#bView').onclick = () => setView((orb.view + 1) % VIEWS.length);
+$('#bView').onclick = () => { learn.closeCard(); setView((orb.view + 1) % VIEWS.length); };
 $('#bLabels').onclick = e => { showLabels = !showLabels; labelBox.classList.toggle('hide', !showLabels); e.currentTarget.classList.toggle('off', !showLabels); };
 $('#panelToggle').onclick = () => document.body.classList.toggle('panel-open');
+// ── 교육 기능 (장소 카드 · 물때 실험 · 미션)
+function focusOn(pos) {
+  const t = pos.clone().applyMatrix4(root.matrixWorld); t.y = Math.min(t.y, 1.2);
+  orb.goal = { az: orb.az, pol: 0.95, dist: orb.fit * 0.42, t };
+}
+const learn = setupLearning({ labels, water, stats, tideSlider: sl.tide, focus: focusOn, audio });
 function kick(a) { jelly.vx += a * 9; jelly.vz -= a * 5; audio.wobble(a); }
 
 // ── 루프
@@ -277,10 +286,10 @@ function frame(now) {
     }
     bLaunch.disabled = life.busy; updStats();
   }
-  applyShear(); updCamera(dt); renderer.render(scene, camera); updLabels(); frames++;
+  applyShear(); updCamera(dt); renderer.render(scene, camera); updLabels(); learn.update(); frames++;
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 setTimeout(() => kick(0.12), 500);
-let frames = 0; const _f = frame; window.__jelly = { get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
+let frames = 0; const _f = frame; window.__jelly = { learn, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
 document.body.classList.add('ready');
