@@ -253,3 +253,21 @@ body.mobile .era-note h3 { font-size:16px; }
 body.mobile .era-note ul { font-size:12.5px; line-height:1.5; margin-bottom:8px; }
 body.mobile .era-badge { top:auto; bottom:128px; left:12px; font-size:11px; }
 body.mobile .era-note.show ~ .era-badge { display:none; }
+
+/* ⑥ 영어 모드 */
+.lang-seg { display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:3px; margin-bottom:10px; border-radius:12px; background:rgba(120,90,60,.08); }
+.lang-seg button { border:0; border-radius:9px; padding:6px 0; font-size:13px; background:none; color:#6d6257; transition:background .2s; }
+.lang-seg button.on { background:#fff; color:var(--j3); box-shadow:0 1px 0 rgba(90,60,30,.12), 0 3px 8px rgba(90,60,30,.1); }
+.place-card.en h3 small { display:block; font-size:12px; color:#8b7e70; margin-top:2px; }
+.place-card.en .pc-body li span { font-size:14.5px; }
+.place-card.en .pc-body li small, .place-card.en .pc-ask small { display:block; font-size:12px; color:#8b7e70; line-height:1.45; margin-top:1px; }
+.place-card .say { border:0; background:color-mix(in srgb,var(--j1) 45%,#fff); border-radius:8px; padding:1px 6px; font-size:12px; vertical-align:1px; }
+.pc-words { display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:10px; }
+.pc-words:empty { display:none; }
+.pc-words > b { font-weight:400; font-size:11.5px; letter-spacing:.08em; color:var(--j3); margin-right:2px; }
+.pc-words .word { border:1.5px solid color-mix(in srgb,var(--j2) 40%,transparent); background:#fff; border-radius:999px; padding:3px 10px 3px; font-size:13px; }
+.pc-words .word small { margin-left:5px; font-size:11px; color:#8b7e70; }
+.pc-btns .pc-say { background:var(--j3); color:#fff; }
+.tm-say { margin-top:6px; border:0; border-radius:9px; padding:5px 10px; font-size:12px; background:#fff; color:var(--j3); }
+.tm-say[hidden], body.no-speech .say, body.no-speech .pc-say, body.no-speech .tm-say { display:none !important; }
+body.mobile .lang-seg { margin-bottom:8px; }

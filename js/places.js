@@ -81,6 +81,7 @@ export const MISSIONS = [
   { id: 'fed', text: '물고기 밥 3번 먹이기', goal: 3 },
   { id: 'quiz', text: '군산 퀴즈 8문제 중 6문제 이상 맞히기' },
   { id: 'eras', text: '그때와 지금: 세 시대를 모두 둘러보기', goal: 3 },
+  { id: 'english', text: 'English: 장소 3곳의 영어 설명 들어 보기 🔊', goal: 3 },
 ];
 
 // ── 퀴즈 문제 (장소 카드 내용에서만 출제)
@@ -158,3 +159,50 @@ export const ERAS = [
     ],
     ask: '세 시대를 비교해 보세요. 가장 크게 달라진 것은 무엇인가요? 좋아진 점과 아쉬운 점을 하나씩 말해 보세요.' },
 ];
+
+// ── 영어 모드: 장소 카드 영어판 (한국어 body와 문장 순서가 같음 → 아래에 한국어가 함께 보임)
+// words: [영어, 뜻]
+export const PLACES_EN = {
+  '내항 뜬다리부두': { name: 'Floating Pier', tag: 'History · Sea',
+    body: ['This pier was built when Japan ruled Korea. It floats on the water.',
+      'The sea here goes up and down a lot, so the pier goes up and down with the water.',
+      'A lot of rice from the Honam Plain was sent to Japan from here.'],
+    ask: 'Move the tide slider. What happens to the pier?',
+    words: [['pier', '부두'], ['float', '물에 뜨다'], ['tide', '밀물과 썰물'], ['rice', '쌀']] },
+  '군산조선소 골리앗 크레인': { name: 'Goliath Crane', tag: 'Industry',
+    body: ['This is a shipyard. Big ships are made in pieces, called blocks.',
+      'The Goliath crane lifts very heavy blocks.',
+      'A new ship goes into the sea. This is called a launch.'],
+    ask: 'Why is a shipyard next to the sea? Press the “진수!” button.',
+    words: [['ship', '배'], ['shipyard', '조선소'], ['heavy', '무거운'], ['launch', '진수']] },
+  '새만금방조제': { name: 'Saemangeum Seawall', tag: 'Geography · Nature',
+    body: ['The Saemangeum Seawall blocks the sea between Gunsan and Buan. It is about 33.9 km long.',
+      'It is the longest seawall in the world.',
+      'It made new land and a lake, but a large mudflat disappeared.'],
+    ask: 'Say one good thing and one sad thing about the seawall.',
+    words: [['seawall', '방조제'], ['long', '긴'], ['land', '땅'], ['lake', '호수']] },
+  '고군산대교': { name: 'Gogunsan Bridge', tag: 'Geography · Travel',
+    body: ['Gogunsan Bridge connects Sinsido Island and Munyeodo Island.',
+      'Now people can drive to islands like Seonyudo and Jangjado.',
+      'The bridge hangs from cables on one tall tower.'],
+    ask: 'How did life on the islands change after the bridge was built?',
+    words: [['bridge', '다리'], ['island', '섬'], ['drive', '차로 가다'], ['tower', '탑']] },
+  '선유도 망주봉': { name: 'Mangjubong Peak', tag: 'Nature · Travel',
+    body: ['Seonyudo means “the island where sinseon (wise spirits) played.”',
+      'Mangjubong is two big rock peaks in the middle of the island.',
+      'Many people visit to see the sandy beach and rocky islands.'],
+    ask: 'Gogunsan has many islands. How many can you find?',
+    words: [['peak', '봉우리'], ['rock', '바위'], ['beach', '해변'], ['visit', '방문하다']] },
+  '십이동파도 청자 난파선': { name: 'Celadon Shipwreck', tag: 'History · Heritage',
+    body: ['An old ship from the Goryeo Dynasty was found under the sea near Sibidongpado.',
+      'Thousands of Goryeo celadon bowls and jars were inside the ship.',
+      'Finding old things under the sea is called underwater excavation.'],
+    ask: 'Why did people long ago carry celadon by sea?',
+    words: [['shipwreck', '난파선'], ['celadon', '청자'], ['under the sea', '바닷속'], ['found', '발견했다']] },
+  '갯벌': { name: 'Mudflat', tag: 'Science · Nature',
+    body: ['A mudflat is muddy land. You can see it when the sea water goes out.',
+      'On the west coast, the tide comes in and goes out about twice a day.',
+      'Crabs, clams and mudskippers live in the mudflat. It also helps clean the sea water.'],
+    ask: 'Move the tide slider to low tide. How much of the mudflat can you see?',
+    words: [['mudflat', '갯벌'], ['low tide', '썰물'], ['high tide', '밀물'], ['crab', '게']] },
+};
