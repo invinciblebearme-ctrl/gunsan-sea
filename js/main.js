@@ -7,6 +7,7 @@ import { buildWorld } from './world.js';
 import { buildLife } from './life.js';
 import { createAudio } from './audio.js';
 import { setupLearning } from './learn.js';
+import { setupQuiz } from './quiz.js';
 
 const $ = s => document.querySelector(s);
 const canvas = $('#c');
@@ -262,6 +263,7 @@ function focusOn(pos) {
   orb.goal = { az: orb.az, pol: 0.95, dist: orb.fit * 0.42, t };
 }
 const learn = setupLearning({ labels, water, stats, tideSlider: sl.tide, focus: focusOn, audio });
+const quiz = setupQuiz({ learn, labels, focus: focusOn, audio });
 function kick(a) { jelly.vx += a * 9; jelly.vz -= a * 5; audio.wobble(a); }
 
 // ── 루프
@@ -291,5 +293,5 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 setTimeout(() => kick(0.12), 500);
-let frames = 0; const _f = frame; window.__jelly = { learn, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
+let frames = 0; const _f = frame; window.__jelly = { learn, quiz, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
 document.body.classList.add('ready');

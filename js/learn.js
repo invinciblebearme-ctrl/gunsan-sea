@@ -130,5 +130,6 @@ export function setupLearning({ labels, water, stats, tideSlider, focus, audio }
     if (stats.fed !== lastFed) { lastFed = stats.fed; if (stats.fed >= 3) complete('fed'); render(); }
   }
   render(); updTide();
-  return { update, closeCard, flatCells: flat.length, exposedPct };
+  const openByName = name => { const l = labels.find(l => l.name === name); if (l) openCard(l); };
+  return { update, closeCard, openByName, complete, isOpen: () => !!open, flatCells: flat.length, exposedPct };
 }
