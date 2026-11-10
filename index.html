@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Gunsan Jelly — 젤리 한 블록에 담긴 군산</title>
+<meta name="description" content="군산 바닷가 마을을 젤리 한 블록에 담은 인터랙티브 3D. 물을 휘젓고, 블록을 흔들고, 배를 진수해 보세요.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,900,100&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<header id="head">
+  <h1 id="title" data-text="Gunsan Jelly." aria-label="Gunsan Jelly."></h1>
+  <p id="sub">군산 · 젤리 한 블록에 담긴 바닷가 마을</p>
+</header>
+
+<div id="labels"></div>
+
+<aside id="panel" aria-label="조작 패널">
+  <button id="panelToggle" type="button" aria-label="패널 펼치기/접기"><i></i><span>조작 패널</span></button>
+  <div class="acts">
+    <button id="bLaunch" class="act main" type="button"><b>진수!</b><small>조선소에서 새 배 내보내기</small></button>
+    <button id="bHorn" class="act" type="button"><b>뱃고동</b></button>
+    <button id="bFeed" class="act" type="button"><b>물고기 밥</b></button>
+    <button id="bBuoy" class="act" type="button"><b>구명튜브</b></button>
+  </div>
+  <div class="stats">
+    <div><em id="stLaunch">0</em><span>진수</span></div>
+    <div><em id="stLaps">0</em><span>유람선 바퀴</span></div>
+    <div><em id="stFed">0</em><span>먹이</span></div>
+  </div>
+  <div class="sec">
+    <h2>젤리 맛</h2>
+    <div class="flavors">
+      <button class="flavor" data-flavor="blue" type="button"><i style="--c1:#a8e0ff;--c2:#1e90ff"></i>새파란 바다</button>
+      <button class="flavor" data-flavor="barley" type="button"><i style="--c1:#ffeaa6;--c2:#f0a81e"></i>찰보리 황금</button>
+      <button class="flavor" data-flavor="celadon" type="button"><i style="--c1:#c9f3e1;--c2:#3dbf98"></i>청자 비취</button>
+    </div>
+  </div>
+  <div class="sec sliders">
+    <label><span>탱탱함</span><input id="sFirm" type="range" min="0" max="100" value="60"></label>
+    <label><span>파도 잔잔함</span><input id="sCalm" type="range" min="0" max="100" value="45"></label>
+    <label><span>물때 <small>썰물 ↔ 밀물</small></span><input id="sTide" type="range" min="0" max="100" value="50"></label>
+    <label><span>바람</span><input id="sWind" type="range" min="0" max="100" value="40"></label>
+  </div>
+  <div class="row5">
+    <button id="bReset" type="button">초기화</button>
+    <button id="bPause" type="button">멈춤</button>
+    <button id="bSound" type="button">소리</button>
+    <button id="bView" type="button">시점</button>
+    <button id="bLabels" type="button">이름표</button>
+  </div>
+  <p class="howto-m">바다를 문지르면 물결 · 땅이나 단면을 당기면 젤리 · 바다 두 번 톡 = 구명튜브 · 빈 곳 드래그 = 회전 · 두 손가락 = 확대</p>
+</aside>
+
+<section id="howto" aria-label="How to play">
+  <h2>HOW TO PLAY</h2>
+  <ul>
+    <li><b>바다 드래그</b> 물결 휘젓기</li>
+    <li><b>땅·단면 드래그</b> 젤리 흔들기</li>
+    <li><b>바다 더블클릭</b> 구명튜브</li>
+    <li><b>빈 곳·오른쪽 드래그</b> 회전 · <b>스크롤</b> 확대</li>
+  </ul>
+</section>
+
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
