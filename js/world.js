@@ -30,6 +30,9 @@ export function buildWorld(root, water) {
   const g = new THREE.Group(); root.add(g);
   const updaters = [], labels = [];
   const add = (o, x, y, z) => { o.position.set(x, y, z); g.add(o); return o; };
+  // 시대별로 켜고 끄는 물체 묶음 (그때와 지금)
+  const eras = { shipyard: [], seawall: [], bridge: [], rice: [] };
+  let mk = 0; const begin = () => { mk = g.children.length; }, end = key => { eras[key].push(...g.children.slice(mk)); };
 
   // ── 1. 내항 뜬다리부두 (부잔교): 밀물·썰물에 맞춰 오르내리는 부교 + 경사 다리
   const pontoons = [];
@@ -75,6 +78,7 @@ export function buildWorld(root, water) {
 
   // ── 2. 군산조선소 골리앗 크레인
   const crane = new THREE.Group(), CR = 0xe9562d;
+  begin();
   {
     const span = 2.7, hgt = 2.5;
     for (const sx of [-span / 2, span / 2]) for (const sz of [-0.32, 0.32]) {
@@ -104,9 +108,11 @@ export function buildWorld(root, water) {
     for (const [bx, bz, c] of [[6.6, -4.6, 0x5a6f8a], [7.9, -4.3, 0x7d8ea3], [7.2, -3.8, 0x51647e]]) { const b = box(0.55, 0.3, 0.45, c); add(b, bx, heightAt(bx, bz) + 0.15, bz); }
     labels.push({ name: '군산조선소 골리앗 크레인', pos: V(cx, 3.35, cz) });
   }
+  end('shipyard');
 
   // ── 3. 새만금방조제 (도로 + 차) 와 풍력발전기
   const A = V(SEAWALL.ax, 0.44, SEAWALL.az - 0.6), B = V(SEAWALL.bx, 0.44, SEAWALL.bz + 0.5);
+  begin();
   g.add(beam(A, B, 0.36, 0.03, 0x4a4f57));
   g.add(beam(V(A.x, 0.46, A.z), V(B.x, 0.46, B.z), 0.02, 0.012, 0xf4e9b0));
   const roadPaths = [new Poly([A, B])];
@@ -122,9 +128,11 @@ export function buildWorld(root, water) {
     const nose = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), M(0xf6f6f2)); hub.add(nose);
     t.add(hub); add(t, tx, heightAt(tx, tz), tz); t.rotation.y = -0.5; turbines.push(hub);
   }
+  end('seawall');
   updaters.push((dt, t, s) => { turbines.forEach((h, i) => { h.rotation.z -= dt * (0.25 + s.wind * 4.2) * (1 + i * 0.07); }); });
 
   // ── 4. 고군산대교 — 외기둥(일주탑) 현수교
+  begin();
   {
     const zc = 5.72, hA = heightAt(1.5, 5.55) + 0.03, hB = heightAt(8.9, 5.95) + 0.03;
     const P0 = V(1.5, hA, 5.55), P1 = V(3.0, 1.02, 5.62), P2 = V(7.4, 1.02, 5.86), P3 = V(8.9, hB, 5.95);
@@ -154,13 +162,14 @@ export function buildWorld(root, water) {
     roadPaths.push(new Poly([P0.clone().setY(P0.y + 0.06), P1.clone().setY(1.08), P2.clone().setY(1.08), P3.clone().setY(P3.y + 0.06)]));
     labels.push({ name: '고군산대교', pos: V(5.95, 4.65, zc) });
   }
+  end('bridge');
   // 차들
   const cars = [], carCols = [0xffffff, 0xf2c230, 0x3f78c9, 0x2d3640, 0x58b88a, 0xff8a3d, 0xe8e8e8];
   [[0, 5], [1, 4]].forEach(([pi, n]) => {
     for (let i = 0; i < n; i++) {
       const c = new THREE.Group(), b = box(0.24, 0.07, 0.11, carCols[(i + pi * 3) % carCols.length]); b.position.y = 0.05; c.add(b);
       const cab = box(0.12, 0.06, 0.1, 0xdfe9f2); cab.position.set(-0.01, 0.11, 0); c.add(cab);
-      g.add(c); cars.push({ c, path: roadPaths[pi], d: rnd() * roadPaths[pi].total, dir: i % 2 ? 1 : -1, sp: 0.7 + rnd() * 0.5 });
+      g.add(c); eras[pi ? 'bridge' : 'seawall'].push(c); cars.push({ c, path: roadPaths[pi], d: rnd() * roadPaths[pi].total, dir: i % 2 ? 1 : -1, sp: 0.7 + rnd() * 0.5 });
     }
   });
   const cp = V(), cd = V();
@@ -271,5 +280,21 @@ export function buildWorld(root, water) {
     tm.castShadow = true; g.add(tm);
   }
 
-  return { group: g, labels, update(dt, t, s) { for (const u of updaters) u(dt, t, s); } };
+  // 1930년대: 뜬다리부두 옆 쌀가마니 더미 (호남평야의 쌀을 실어 나르던 항구)
+  {
+    const SACK = 0xd9c79c, SACK2 = 0xcbb688;
+    for (const [px, dz] of [[-5.75, -0.45], [-5.2, -0.5], [-7.4, -0.5]]) {
+      const pz = coastZ(px) + dz, py = heightAt(px, pz), pile = new THREE.Group();
+      let n = 0;
+      for (let ly = 0; ly < 3; ly++) for (let ix = 0; ix < 3 - ly; ix++) for (let iz = 0; iz < 2; iz++) {
+        const sk = box(0.16, 0.09, 0.11, (n++ % 3) ? SACK : SACK2);
+        sk.position.set((ix - (2 - ly) / 2) * 0.17, 0.05 + ly * 0.09, (iz - 0.5) * 0.12); sk.rotation.y = (rnd() - 0.5) * 0.2; pile.add(sk);
+      }
+      add(pile, px, py, pz); eras.rice.push(pile); pile.visible = false;
+    }
+  }
+  function setEra(on) {   // on: { shipyard, seawall, bridge, rice } → true/false
+    for (const k in eras) for (const o of eras[k]) o.visible = !!on[k];
+  }
+  return { group: g, labels, setEra, update(dt, t, s) { for (const u of updaters) u(dt, t, s); } };
 }

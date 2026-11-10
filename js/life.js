@@ -61,6 +61,7 @@ export function buildLife(root, water, spray, audio, clipPlane, stats) {
   setClip(ship, clipPlane); setClip(tug, clipPlane); g.add(ship, tug);
   const shipC = curve(ROUTES.ship, false), shipLen = shipC.getLength();
   const L = { phase: 'ready', d: 0, sp: 0, wait: 0, pop: 1 };
+  let yardOn = true;   // 그때와 지금: 조선소가 없는 시대엔 배를 숨김
   const placeOn = (o, c, len, d, draft, Lb, amt, dt) => {
     const u = Math.max(0, Math.min(1, d / len)); c.getPointAt(u, tmp); c.getTangentAt(u, tan);
     const yaw = Math.atan2(-tan.z, tan.x);
@@ -83,7 +84,7 @@ export function buildLife(root, water, spray, audio, clipPlane, stats) {
     const moving = L.phase === 'out' ? 0.004 + L.sp * 0.006 : 0;
     placeOn(ship, shipC, shipLen, L.d, 0.02, 3.0, moving, dt); ship.scale.setScalar(Math.max(0.01, sc));
     placeOn(tug, shipC, shipLen, L.d + 2.3, 0.0, 0.85, moving * 0.5, dt); tug.scale.setScalar(Math.max(0.01, sc));
-    ship.visible = tug.visible = L.phase !== 'gone';
+    ship.visible = tug.visible = yardOn && L.phase !== 'gone';
   }
 
   // ── 유람선 (선유도 순환)
@@ -268,5 +269,5 @@ export function buildLife(root, water, spray, audio, clipPlane, stats) {
     L.phase = 'ready'; L.d = 0; L.pop = 1; state.launching = false; cd = cruiseLen * 0.08;
     for (const b of buoys) g.remove(b.m); buoys.length = 0; food.length = 0;
   }
-  return { update, launch, feed, dropBuoy, setSailColor, reset, state, get busy() { return L.phase !== 'ready'; } };
+  return { update, launch, feed, dropBuoy, setSailColor, reset, state, setYard(on) { yardOn = on; ship.visible = tug.visible = on && L.phase !== 'gone'; }, get busy() { return L.phase !== 'ready'; } };
 }

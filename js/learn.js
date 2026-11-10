@@ -61,7 +61,9 @@ export function setupLearning({ labels, water, stats, tideSlider, focus, audio }
     audio.blip?.();
     showToast(n === MISSIONS.length ? '🎉 <b>모든 미션 완료!</b> 군산 탐험가가 되었어요' : `⭐ <b>미션 완료</b> ${m.text}`);
   }
+  const extra = {};   // 다른 모듈이 알려 주는 진행 수 (예: 둘러본 시대 수)
   function progress(m) {
+    if (m.id in extra) return extra[m.id];
     if (m.id === 'cards') return seen.size;
     if (m.id === 'fed') return Math.min(m.goal, stats.fed);
     return null;
@@ -131,5 +133,6 @@ export function setupLearning({ labels, water, stats, tideSlider, focus, audio }
   }
   render(); updTide();
   const openByName = name => { const l = labels.find(l => l.name === name); if (l) openCard(l); };
-  return { update, closeCard, openByName, complete, isOpen: () => !!open, flatCells: flat.length, exposedPct };
+  const setProgress = (id, n) => { extra[id] = n; render(); };
+  return { update, closeCard, openByName, complete, setProgress, isOpen: () => !!open, flatCells: flat.length, exposedPct };
 }

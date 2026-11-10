@@ -8,6 +8,7 @@ import { buildLife } from './life.js';
 import { createAudio } from './audio.js';
 import { setupLearning } from './learn.js';
 import { setupQuiz } from './quiz.js';
+import { setupEra } from './era.js';
 
 const $ = s => document.querySelector(s);
 const canvas = $('#c');
@@ -212,7 +213,7 @@ function updLabels() {
     P.copy(l.pos).applyMatrix4(root.matrixWorld).project(camera);
     const x = (P.x * 0.5 + 0.5) * layout.W, y = (-P.y * 0.5 + 0.5) * layout.H;
     l.el.style.transform = `translate(-50%,-100%) translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
-    const vis = P.z < 1 && x > 20 && x < layout.W - 20 && y > 20 && y < layout.H - 10;
+    const vis = !l.off && P.z < 1 && x > 20 && x < layout.W - 20 && y > 20 && y < layout.H - 10;
     l.el.style.opacity = vis ? 1 : 0; l.el.style.pointerEvents = vis ? '' : 'none';
   }
 }
@@ -243,13 +244,13 @@ function readSliders() {
 for (const k in sl) sl[k].addEventListener('input', readSliders);
 function updStats() { if (!stats.dirty) return; stats.dirty = false; $('#stLaunch').textContent = stats.launch; $('#stLaps').textContent = stats.laps; $('#stFed').textContent = stats.fed; }
 const bLaunch = $('#bLaunch');
-bLaunch.onclick = () => { life.launch(); };
+bLaunch.onclick = () => { if (era.launchOK) life.launch(); };
 $('#bHorn').onclick = () => audio.horn();
 $('#bFeed').onclick = () => life.feed();
 $('#bBuoy').onclick = () => life.dropBuoy();
 document.querySelectorAll('.flavor').forEach(b => b.onclick = () => { setFlavor(b.dataset.flavor); audio.plop(); });
 $('#bReset').onclick = () => {
-  for (const k in sl) sl[k].value = DEF[k]; readSliders(); setFlavor('blue'); water.reset(); life.reset();
+  for (const k in sl) sl[k].value = DEF[k]; era.reset(); readSliders(); setFlavor('blue'); water.reset(); life.reset();
   stats.launch = stats.laps = stats.fed = 0; stats.dirty = true; setView(0); kick(0.16);
 };
 $('#bPause').onclick = e => { paused = !paused; e.currentTarget.classList.toggle('on', paused); e.currentTarget.textContent = paused ? '계속' : '멈춤'; };
@@ -264,6 +265,7 @@ function focusOn(pos) {
 }
 const learn = setupLearning({ labels, water, stats, tideSlider: sl.tide, focus: focusOn, audio });
 const quiz = setupQuiz({ learn, labels, focus: focusOn, audio });
+const era = setupEra({ terrain, water, world, life, labels, learn, kick: a => kick(a), audio });
 function kick(a) { jelly.vx += a * 9; jelly.vz -= a * 5; audio.wobble(a); }
 
 // ── 루프
@@ -286,12 +288,12 @@ function frame(now) {
         if (water.shore[k] > 0.6 && Math.abs(water.v[k]) > 0.012) spray.emit(-HX + (k % 131) * 0.2, water.ys[k], -HZ + ((k / 131) | 0) * 0.2, 3, 0.4, 1.2 + Math.abs(water.v[k]) * 30);
       }
     }
-    bLaunch.disabled = life.busy; updStats();
+    bLaunch.disabled = life.busy || !era.launchOK; updStats();
   }
   applyShear(); updCamera(dt); renderer.render(scene, camera); updLabels(); learn.update(); frames++;
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 setTimeout(() => kick(0.12), 500);
-let frames = 0; const _f = frame; window.__jelly = { learn, quiz, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
+let frames = 0; const _f = frame; window.__jelly = { learn, quiz, era, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
 document.body.classList.add('ready');

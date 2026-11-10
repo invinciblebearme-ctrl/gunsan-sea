@@ -34,6 +34,8 @@ export const BREAK = { ax: -2.3, az: 6.5, bx: -3.5, bz: 7.5 };
 const ROCKS = [[-11.3, 5.4, 0.5, 0.85], [-10.5, 6.4, 0.42, 0.65], [-11.6, 7.2, 0.38, 0.55]];
 
 let _id = 0, _s = 0;
+// 시대 설정: seawall=false 이면 새만금방조제가 없는 옛 바다 (그때와 지금 기능)
+export const ERA = { seawall: true };
 // id: 0 육지, 1 방조제, 2 신시도, 3 선유도, 4 명사십리, 5 방파제, 6 장자도, 7 바위섬
 export function sample(x, z) {
   let H, id = 0, h, s;
@@ -46,8 +48,10 @@ export function sample(x, z) {
     + hill(x, z, 3, -8.9, 2, 0.9) + hill(x, z, 10.6, -8.4, 1.8, 0.9) + 0.05 * Math.sin(x * 2.1) * Math.sin(z * 1.7));
   H = h;
   // 1. 새만금방조제
-  s = 0.34 - segDist(x, z, SEAWALL.ax, SEAWALL.az, SEAWALL.bx, SEAWALL.bz);
-  h = prof(s, 0.7, 0.14, 0.42); if (h > H) { H = h; id = 1; }
+  if (ERA.seawall) {
+    s = 0.34 - segDist(x, z, SEAWALL.ax, SEAWALL.az, SEAWALL.bx, SEAWALL.bz);
+    h = prof(s, 0.7, 0.14, 0.42); if (h > H) { H = h; id = 1; }
+  }
   // 2. 신시도
   s = ell(x, z, 9.9, 5.9, 2.2, 1.7, 0.07);
   h = prof(s, 0.9, 0.5, 0.34) + sm(0, 0.5, s) * hill(x, z, 10.4, 6.4, 1.1, 1.35); if (h > H) { H = h; id = 2; }
@@ -164,7 +168,7 @@ export function buildTerrain(uniforms) {
   const step = 0.1, nx = Math.round(W / step) + 1, nz = Math.round(D / step) + 1;
   const pos = new Float32Array(nx * nz * 3), nor = new Float32Array(nx * nz * 3), col = new Float32Array(nx * nz * 3);
   const hdata = new Uint16Array(nx * nz), c3 = [0, 0, 0], e = 0.05;
-  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
+  const fill = () => { for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
     const x = -HX + i * step, z = -HZ + j * step, k = j * nx + i;
     const gx = (sample(x + e, z) - sample(x - e, z)) / (2 * e), gz = (sample(x, z + e) - sample(x, z - e)) / (2 * e);
     const h = sample(x, z), id = _id, inl = _s;
@@ -172,7 +176,8 @@ export function buildTerrain(uniforms) {
     const l = Math.hypot(gx, 1, gz); nor[k * 3] = -gx / l; nor[k * 3 + 1] = 1 / l; nor[k * 3 + 2] = -gz / l;
     colorAt(x, z, h, Math.hypot(gx, gz), id, inl, c3); col.set(c3, k * 3);
     hdata[k] = THREE.DataUtils.toHalfFloat(h);
-  }
+  } };
+  fill();
   const idx = new Uint32Array((nx - 1) * (nz - 1) * 6); let q = 0;
   for (let j = 0; j < nz - 1; j++) for (let i = 0; i < nx - 1; i++) {
     const a = j * nx + i, b = a + 1, c = a + nx, d = c + 1;
@@ -223,5 +228,14 @@ export function buildTerrain(uniforms) {
   walls.castShadow = true; walls.receiveShadow = true;
   const cap = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ color: 0x573828 }));
   cap.rotation.x = Math.PI / 2; cap.position.y = BOTTOM;
-  return { mesh, walls, cap, heightTex };
+  // 지형 다시 계산 (ERA 변경 후 호출): 같은 버퍼에 높이·법선·색·높이텍스처·단면 윗선을 다시 채움
+  function refill() {
+    fill();
+    for (const k of ['position', 'normal', 'color']) geo.attributes[k].needsUpdate = true;
+    geo.computeBoundingSphere(); geo.computeBoundingBox(); heightTex.needsUpdate = true;
+    const P = wg.attributes.position, U = wg.attributes.uv;
+    for (let v = 1; v < P.count; v += 2) { const h = sample(P.getX(v), P.getZ(v)); P.setY(v, h); U.setY(v, (h - BOTTOM) / (VTOP - BOTTOM)); }
+    P.needsUpdate = true; U.needsUpdate = true; wg.computeBoundingSphere();
+  }
+  return { mesh, walls, cap, heightTex, refill };
 }

@@ -141,6 +141,11 @@ export class Water {
     }
   }
 
+  // 지형이 바뀐 뒤(시대 전환) 땅·바다 구분 다시 계산
+  refreshTerrain() {
+    for (let j = 0; j < NZ; j++) for (let i = 0; i < NX; i++) this.terr[j * NX + i] = heightAt(-HX + i * CELL, -HZ + j * CELL);
+    this.setSea(this.sea);
+  }
   reset() { this.h.fill(0); this.v.fill(0); this.slosh.x = this.slosh.z = 0; }
   inside(x, z) { return Math.abs(x) < HX && Math.abs(z) < HZ; }
   cell(x, z) {
