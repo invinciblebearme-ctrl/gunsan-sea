@@ -271,3 +271,36 @@ body.mobile .era-note.show ~ .era-badge { display:none; }
 .tm-say { margin-top:6px; border:0; border-radius:9px; padding:5px 10px; font-size:12px; background:#fff; color:var(--j3); }
 .tm-say[hidden], body.no-speech .say, body.no-speech .pc-say, body.no-speech .tm-say { display:none !important; }
 body.mobile .lang-seg { margin-bottom:8px; }
+
+/* ⑦ 교사용: 간단 화면 · 발표 모드 */
+.teacher .tc-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.teacher .tc-row button { border:0; border-radius:12px; padding:9px 0; font-size:13px; background:rgba(120,90,60,.09); }
+.teacher .tc-present { background:var(--j3) !important; color:#fff; }
+.teacher .tc-simple.on { background:var(--j2); color:#fff; }
+.tc-note { margin:6px 2px 0; font-size:11px; line-height:1.5; color:#8b7e70; }
+/* 간단 화면: 학습과 상관없는 조절 숨김 */
+body.simple #panel .sec:has(.flavors), body.simple .sliders label:has(#sFirm), body.simple .sliders label:has(#sCalm),
+body.simple .sliders label:has(#sWind), body.simple .tm-note { display:none; }
+/* 발표 모드 */
+.present-bar { position:fixed; left:50%; bottom:18px; z-index:6; transform:translateX(-50%); display:none; align-items:center; gap:6px; max-width:calc(100vw - 24px);
+  padding:7px; border-radius:20px; background:rgba(255,253,249,.95); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 14px 34px rgba(60,40,20,.2); }
+body.present .present-bar { display:flex; }
+.pb-list { display:flex; gap:5px; overflow-x:auto; scrollbar-width:none; }
+.pb-list::-webkit-scrollbar { display:none; }
+.present-bar button { flex:none; border:0; border-radius:13px; padding:10px 13px; font-size:14px; background:rgba(120,90,60,.08); white-space:nowrap; }
+.present-bar .pb-list button.on { background:var(--j2); color:#fff; }
+.present-bar button:disabled { opacity:.35; }
+.present-bar .pb-prev, .present-bar .pb-next { background:var(--j3); color:#fff; padding:10px 14px; }
+.present-bar .pb-end { background:none; color:#8b7e70; text-decoration:underline; }
+body.present #panel, body.present #howto, body.present .era-note, body.present .quiz-back { display:none !important; }
+body.present .pill { font-size:15px; padding:6px 14px 7px; }
+body.present .place-card { width:min(470px, calc(100vw - 32px)); padding:22px 24px 20px; top:calc(50% - 40px); }
+body.present .place-card h3 { font-size:26px; }
+body.present .place-card .pc-body { font-size:18px; line-height:1.6; }
+body.present .place-card.en .pc-body li span { font-size:18px; }
+body.present .place-card .pc-ask { font-size:16.5px; }
+body.present .place-card .pc-btns { display:none; }
+body.mobile.present .place-card { bottom:84px; top:auto; max-height:calc(100% - 200px); padding:14px; }
+body.mobile.present .place-card h3 { font-size:19px; }
+body.mobile.present .place-card .pc-body, body.mobile.present .place-card.en .pc-body li span { font-size:14.5px; }
+body.mobile .present-bar { bottom:8px; }
