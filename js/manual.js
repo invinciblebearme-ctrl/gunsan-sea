@@ -1,0 +1,72 @@
+// manual.js — HOW TO PLAY '자세히 보기': 기능별 자세한 사용 설명서 (펼쳐 보기)
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+
+// [제목, 내용(HTML)] — 화면에 보이는 버튼 이름과 똑같이 적음
+const SECTIONS = [
+  ['🖐️ 기본 조작', `<ul>
+    <li><b>바다를 드래그</b>하면 물결이 일어요. 빠르게 문지르면 물보라가 튀어요.</li>
+    <li><b>땅이나 블록 옆면(단면)을 드래그</b>하면 젤리 블록이 출렁여요. 물도 반대로 쏠려요.</li>
+    <li><b>바다를 두 번 톡</b>(더블클릭)하면 그 자리에 구명튜브가 떨어져요.</li>
+    <li><b>빈 곳이나 오른쪽 버튼으로 드래그</b>하면 화면이 돌아가요. <b>스크롤</b>(휴대폰은 두 손가락)로 확대·축소해요.</li>
+    <li><b>시점</b> 버튼은 정해진 보기 각도를 차례로 바꿔요. <b>초기화</b>는 처음 모습으로 돌려요.</li>
+    <li>휴대폰에서는 아래 <b>조작 패널</b>을 위로 올려야 모든 버튼이 보여요.</li></ul>`],
+  ['🚢 진수 · 뱃고동 · 물고기 밥 · 구명튜브', `<ul>
+    <li><b>진수!</b> — 조선소에서 새 배가 바다로 나가요. 배가 블록 밖으로 나가면 ‘진수’ 숫자가 올라가요.</li>
+    <li><b>뱃고동</b> — 배 소리를 들어요. (처음 한 번은 화면을 눌러야 소리가 나요.)</li>
+    <li><b>물고기 밥</b> — 먹이를 뿌리면 물고기 떼가 모여들어 먹어요. ‘먹이’ 숫자가 올라가요.</li>
+    <li><b>구명튜브</b> — 하늘에서 튜브가 떨어져 물결을 따라 떠다녀요.</li>
+    <li>젤리 맛(바다·보리·청자 색), 탱탱함, 파도 잔잔함, 바람 슬라이더로 모습을 바꿀 수 있어요.</li></ul>`],
+  ['📍 장소 카드', `<ul>
+    <li>장면의 <b>이름표</b>를 누르면 그 장소의 설명 카드가 열려요. 이름표는 모두 10곳이에요.</li>
+    <li>카드에는 설명, <b>🌿 자연환경 / 🏗️ 인문환경</b> 구분, <b>🔗 연결 고리</b>, <b>생각해 보기</b> 질문이 있어요.</li>
+    <li><b>가까이 보기</b>를 누르면 카메라가 그 장소로 다가가요. 본 이름표에는 ✓ 표시가 붙어요.</li>
+    <li>이름표가 화면을 가리면 패널의 <b>이름표</b> 버튼으로 숨길 수 있어요.</li></ul>`],
+  ['🌊 물때 실험 (밀물과 썰물)', `<ul>
+    <li>패널의 <b>물때</b> 슬라이더를 왼쪽(썰물)·오른쪽(밀물)으로 움직여 보세요.</li>
+    <li>아래 읽기 판에 지금 물때, <b>물 높이</b>(군산 앞바다 최대 조차 약 7m로 환산), <b>갯벌이 드러난 비율</b>이 나와요.</li>
+    <li>썰물이면 왼쪽 갯벌이 넓게 드러나고, 뜬다리부두는 물과 함께 내려가요.</li></ul>`],
+  ['⭐ 탐험 미션', `<ul>
+    <li>패널의 <b>탐험 미션</b>에 할 일 11가지가 있어요. 하나씩 해내면 자동으로 ✓ 표시가 되고 알림이 떠요.</li>
+    <li>진행 상황은 이 브라우저에 저장돼요. 다른 학생이 쓸 때는 <b>미션 처음부터</b>를 눌러 주세요.</li></ul>`],
+  ['🧩 군산 퀴즈', `<ul>
+    <li><b>군산 퀴즈</b>를 누르면 18문제 중 8문제가 무작위로 나와요. OX 문제와 사지선다 문제가 있어요.</li>
+    <li>답을 고르면 정답과 해설이 나와요. <b>카드 보기</b>로 그 장소 카드를 읽고 <b>퀴즈로 돌아가기</b>로 이어서 풀 수 있어요.</li>
+    <li>6문제 이상 맞히면 미션 통과! 최고 점수가 버튼에 표시돼요.</li></ul>`],
+  ['🌿 자연환경 · 인문환경', `<ul>
+    <li><b>자연환경</b>은 산·바다·섬·갯벌처럼 자연이 만든 것, <b>인문환경</b>은 다리·항구·건물·공장처럼 사람이 만든 것이에요.</li>
+    <li>이름표 테두리 색이 <b>초록(자연)</b>·<b>주황(인문)</b>이에요. <b>모두 / 자연환경 / 인문환경</b>을 눌러 골라 볼 수 있어요.</li>
+    <li><b>🧺 분류 놀이</b>에서 장소마다 자연·인문을 골라 보세요. 모두 맞히면 미션 통과예요.</li>
+    <li>카드의 <b>🔗 연결 고리</b>를 읽고, 자연환경이 사람들의 삶(인문환경)에 어떤 영향을 주었는지 이야기해 보세요.</li></ul>`],
+  ['⏳ 그때와 지금', `<ul>
+    <li><b>1930년대 · 1990년 · 지금</b> 중 하나를 고르면 그 시대의 모습으로 바뀌어요.</li>
+    <li>1930년대에는 뜬다리부두 옆 <b>쌀가마니</b>를 찾아보세요. 1990년에는 새만금방조제가 없어 바다가 트여 있어요.</li>
+    <li>그 시대에 없던 시설(방조제, 다리, 조선소, 풍력발전기)은 사라지고, 진수 버튼도 꺼져요.</li></ul>`],
+  ['🔤 영어 모드 (English)', `<ul>
+    <li>패널 맨 위 <b>English</b>를 누르면 이름표와 장소 카드가 영어로 바뀌어요. 영어 문장 아래에 한국어 뜻이 함께 나와요.</li>
+    <li>문장 옆 <b>🔊</b>, 카드의 <b>🔊 Listen</b>, <b>Words</b> 낱말을 누르면 영어 발음을 들을 수 있어요.</li>
+    <li>물때 판의 <b>🔊 Say it</b>은 “It is low tide.” 같은 문장을 읽어 줘요.</li></ul>`],
+  ['📝 나의 학습 기록', `<ul>
+    <li>미션 판 아래 <b>나의 학습 기록</b>을 누르면 미션·퀴즈·본 장소·둘러본 시대가 한 장에 정리돼요.</li>
+    <li>이름과 <b>오늘 알게 된 것 한 가지</b>를 쓰고, <b>📋 복사하기</b>로 활동지나 학급 게시판에 붙여 넣어요.</li>
+    <li><b>🖨️ 인쇄하기</b>로 기록 카드만 인쇄할 수 있어요. (인쇄가 막힌 화면도 있어요.)</li></ul>`],
+  ['🎓 선생님께 (교사용)', `<ul>
+    <li><b>발표 모드</b>: 패널이 사라지고 아래에 장소 줄이 나와요. 버튼이나 <b>←/→</b> 키로 한 곳씩 이동하며 큰 글씨 카드로 설명해요. <b>Esc</b>로 끝내요.</li>
+    <li><b>간단 화면</b>: 저학년용으로 젤리 맛·탱탱함·파도·바람 조절을 숨겨요.</li>
+    <li>카드·퀴즈·시대 설명 글은 <code>js/places.js</code> 파일 한 곳에서 고칠 수 있어요.</li></ul>`],
+];
+
+export function setupManual() {
+  const box = el('section', 'quiz manual', `<button type="button" class="pc-x" aria-label="닫기">✕</button>
+    <h3>📖 Gunsan Jelly 사용 설명서</h3><p class="mn-lead">궁금한 항목을 눌러 펼쳐 보세요.</p>
+    <div class="mn-list">${SECTIONS.map(([t, h], i) => `<details${i === 0 ? ' open' : ''}><summary>${t}</summary>${h}</details>`).join('')}</div>`);
+  box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', '사용 설명서'); document.body.appendChild(box);
+  const open = () => { box.classList.add('show'); document.body.classList.add('quiz-open'); document.body.classList.remove('panel-open'); };
+  const close = () => { box.classList.remove('show'); document.body.classList.remove('quiz-open'); };
+  box.querySelector('.pc-x').onclick = close;
+  window.addEventListener('keydown', e => { if (e.key === 'Escape' && box.classList.contains('show')) close(); });
+  // HOW TO PLAY 상자(데스크톱)와 모바일 안내 문구에 '자세히 보기' 버튼
+  const add = (where, cls) => { if (!where) return; const b = el('button', cls, '📖 자세히 보기'); b.type = 'button'; b.onclick = open; where.appendChild(b); };
+  add(document.querySelector('#howto'), 'mn-open');
+  add(document.querySelector('#panel .howto-m'), 'mn-open mn-inline');
+  return { open, close };
+}
