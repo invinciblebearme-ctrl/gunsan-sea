@@ -19,6 +19,10 @@ button { font:inherit; color:inherit; cursor:pointer; }
   background:linear-gradient(158deg, rgba(255,255,255,.95) 8%, rgba(255,255,255,.55) 24%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 82%, rgba(255,255,255,.35) 100%);
   -webkit-background-clip:text; background-clip:text; color:transparent; }
 .jl.sp { width:.24em; }
+/* background-clip:text 는 글자 상자 안만 칠하므로, 줄 높이(.95)보다 큰 글자 윗부분·아래 꼬리가 잘리지 않게
+   위아래로 여백을 주고 같은 만큼 바깥 여백을 빼서 자리와 크기는 그대로 둠 */
+.jl { padding:.2em .05em .26em; margin:-.2em -.05em -.26em; }
+.jl::after { padding:inherit; }
 .jl.boing { animation:boing .75s cubic-bezier(.3,1.6,.5,1), breathe 3.8s ease-in-out .75s infinite; }
 @keyframes breathe { 0%,100% { transform:scale(1,1); } 50% { transform:scale(1.04,.95) translateY(1px); } }
 @keyframes boing { 0% { transform:scale(1,1); } 18% { transform:scale(1.28,.68); } 40% { transform:scale(.84,1.22); } 62% { transform:scale(1.1,.92); } 82% { transform:scale(.97,1.03); } 100% { transform:scale(1,1); } }
