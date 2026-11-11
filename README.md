@@ -4,7 +4,7 @@
 바다를 휘젓고 블록을 흔들며 놀다 보면, 군산의 **자연환경과 인문환경**, **밀물과 썰물**, **지역의 변화**를 배울 수 있어요.
 
 - 만든 도구: three.js 0.170 (인터넷에서 불러옴), 빌드 과정 없는 HTML·CSS·JS
-- 실행: 이 폴더에서 `python -m http.server` 실행 후 브라우저로 `localhost:8000` 열기
+- 실행: 저장소 맨 위 폴더에서 `python -m http.server` 실행 후 브라우저로 `localhost:8000` 열기
   (`index.html`을 더블클릭해서 열면 동작하지 않아요. 인터넷 연결이 필요해요.)
 - 내용 고치기: 장소 카드·퀴즈·시대 설명·영어 문장·자연/인문 구분은 모두 **`js/places.js`** 한 파일에 있어요.
 
@@ -16,16 +16,18 @@
 
 | 단계 | 내용 | 커밋 | 백업 브랜치 |
 |---|---|---|---|
-| 0 | 작업 전 `main` (군산시 3D 지도만 있음) | `ae56a6b` | `backup/gunsan-jelly-main-before-gunsan-jelly` |
-| 1 | 원본 | `7d648d9` | `backup/gunsan-jelly-stage-1-original` |
-| 2 | 장소 카드 · 물때 실험 · 탐험 미션 | `cd2d1e3` | `backup/gunsan-jelly-stage-2-cards-tide-missions` |
-| 3 | 군산 퀴즈 | `95a9251` | `backup/gunsan-jelly-stage-3-quiz` |
-| 4 | 그때와 지금 | `7223c46` | `backup/gunsan-jelly-stage-4-then-and-now` |
-| 5 | 영어 모드 | `ace24a1` | `backup/gunsan-jelly-stage-5-english` |
-| 6 | 교사용 기능 (발표 모드 · 간단 화면) | `8395db9` | `backup/gunsan-jelly-stage-6-teacher` |
-| 7 | 자연환경 · 인문환경 | `3d535d8` | `backup/gunsan-jelly-stage-7-environment` |
-| 8 | 나의 학습 기록 | `7873550` | `backup/gunsan-jelly-stage-8-record` |
-| 마무리 | 부제 · 자세한 사용 설명서 · 이 문서 | (main에 합칠 때) | — |
+| 1 | 원본 | `b7a831f` | `backup/stage-1-original` |
+| 2 | 장소 카드 · 물때 실험 · 탐험 미션 | `d2f1bb0` | `backup/stage-2-cards-tide-missions` |
+| 3 | 군산 퀴즈 | `70c0a04` | `backup/stage-3-quiz` |
+| 4 | 그때와 지금 | `5160bd6` | `backup/stage-4-then-and-now` |
+| 5 | 영어 모드 | `dbf500a` | `backup/stage-5-english` |
+| 6 | 교사용 기능 (발표 모드 · 간단 화면) | `2933d9c` | `backup/stage-6-teacher` |
+| 7 | 자연환경 · 인문환경 | `1cc82a8` | `backup/stage-7-environment` |
+| 8 | 나의 학습 기록 | `86a930e` | `backup/stage-8-record` |
+| 마무리 | 부제 · 자세한 사용 설명서 · 이 문서 | `e053e92` | `main` |
+
+> 이 저장소는 처음에 `gunsan-3d` 저장소의 `gunsan-jelly/` 폴더에서 만들었다가, 커밋 기록을 그대로 살려 옮겨 온 것이에요.
+> 그래서 커밋 메시지에 나오는 `gunsan-jelly/` 폴더는 이 저장소의 맨 위 폴더와 같아요.
 
 ### 1단계 · 원본
 - 군산 바닷가 마을을 젤리 블록에 담은 3D 장면. 바다를 드래그하면 물결, 블록을 드래그하면 출렁임.
