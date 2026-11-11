@@ -4,7 +4,7 @@ import { ERAS } from './places.js';
 
 const KEY = 'gunsan-jelly-eras-seen';
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
-const HIDE = { shipyard: '군산조선소 골리앗 크레인', seawall: '새만금방조제', bridge: '고군산대교' };
+const HIDE = { shipyard: ['군산조선소 골리앗 크레인'], seawall: ['새만금방조제', '풍력발전기'], bridge: ['고군산대교'] };
 
 export function setupEra({ terrain, water, world, life, labels, learn, kick, audio }) {
   let seen = new Set();
@@ -33,7 +33,7 @@ export function setupEra({ terrain, water, world, life, labels, learn, kick, aud
     if (ERA.seawall !== e.on.seawall) { ERA.seawall = e.on.seawall; terrain.refill(); water.refreshTerrain(); }
     world.setEra(e.on);
     life.setYard(e.on.shipyard);
-    for (const k in HIDE) { const l = labels.find(l => l.name === HIDE[k]); if (l) l.off = !e.on[k]; }
+    for (const k in HIDE) for (const n of HIDE[k]) { const l = labels.find(l => l.name === n); if (l) l.off = !e.on[k]; }
     btns.forEach(b => { const on = b.dataset.era === e.id; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
     document.body.classList.toggle('past', e.id !== 'now');
     badge.textContent = e.id === 'now' ? '' : `⏳ ${e.name} · ${e.sub}`;

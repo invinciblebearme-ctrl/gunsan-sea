@@ -72,7 +72,7 @@ export const PLACES = {
 export const TIDE_RANGE_M = 7;
 
 export const MISSIONS = [
-  { id: 'cards', text: '이름표 7곳을 모두 눌러 보기', goal: 7 },
+  { id: 'cards', text: '이름표를 모두 눌러 보기', goal: 7 },   // goal은 실행할 때 이름표 수로 바뀜
   { id: 'ebb', text: '썰물: 물때를 내려 갯벌을 80% 이상 드러내기' },
   { id: 'flood', text: '밀물: 물때를 올려 갯벌을 거의 다 잠기게 하기 (20% 이하)' },
   { id: 'pier', text: '뜬다리부두 카드를 열고 물때 바꿔 보기' },
@@ -82,6 +82,7 @@ export const MISSIONS = [
   { id: 'quiz', text: '군산 퀴즈 8문제 중 6문제 이상 맞히기' },
   { id: 'eras', text: '그때와 지금: 세 시대를 모두 둘러보기', goal: 3 },
   { id: 'english', text: 'English: 장소 3곳의 영어 설명 들어 보기 🔊', goal: 3 },
+  { id: 'env', text: '자연환경·인문환경 분류 놀이 모두 맞히기' },
 ];
 
 // ── 퀴즈 문제 (장소 카드 내용에서만 출제)
@@ -128,6 +129,14 @@ export const QUIZ = [
   { place: '내항 뜬다리부두', type: 'mc', q: '1930년대 군산항에서 일본으로 많이 실어 나른 것은 무엇일까요?',
     choices: ['쌀', '석탄', '자동차', '청자'], answer: 0,
     why: '호남평야에서 거둔 쌀이 군산항을 통해 일본으로 많이 실려 나갔어요. ‘그때와 지금’의 1930년대에서 쌀가마니를 찾아보세요.' },
+  { place: '갯벌', type: 'mc', q: '다음 중 자연환경은 무엇일까요?',
+    choices: ['갯벌', '고군산대교', '새만금방조제', '조선소'], answer: 0,
+    why: '갯벌은 바닷물이 드나들며 저절로 생긴 자연환경이에요. 나머지는 사람이 만든 인문환경이에요.' },
+  { place: '구 군산세관', type: 'mc', q: '다음 중 인문환경은 무엇일까요?',
+    choices: ['명사십리 해변', '망주봉', '구 군산세관', '갯벌'], answer: 2,
+    why: '구 군산세관은 사람이 지은 건물이라 인문환경이에요.' },
+  { place: '내항 뜬다리부두', type: 'ox', q: '뜬다리부두는 밀물·썰물 차이가 큰 바다(자연환경)에 맞추어 사람이 만든 인문환경이다.', answer: true,
+    why: '자연환경이 인문환경에 영향을 준 예예요. 물 높이가 크게 바뀌는 바다라서 물에 뜨는 부두를 만들었어요.' },
 ];
 export const QUIZ_ROUND = 8;   // 한 번에 푸는 문제 수
 export const QUIZ_PASS = 6;    // 미션 통과 점수
@@ -206,3 +215,70 @@ export const PLACES_EN = {
     ask: 'Move the tide slider to low tide. How much of the mudflat can you see?',
     words: [['mudflat', '갯벌'], ['low tide', '썰물'], ['high tide', '밀물'], ['crab', '게']] },
 };
+
+// ── 자연환경 · 인문환경 (초등 사회: 우리 지역의 자연환경과 인문환경)
+// 새로 추가하는 장소 3곳 (장면에 이미 있는 물체)
+Object.assign(PLACES, {
+  '명사십리 해변': {
+    tag: '자연 · 지형',
+    body: [
+      '선유도에 있는 고운 모래 해변이에요.',
+      '‘명사십리’는 고운 모래가 십 리나 길게 이어진 곳이라는 뜻의 이름이에요.',
+      '파도와 바람이 오랫동안 모래를 쌓아 해변이 만들어졌어요.',
+    ],
+    ask: '해변이 있어서 생긴 인문환경은 무엇일까요? 장면에서 파라솔을 찾아보세요.',
+  },
+  '구 군산세관': {
+    tag: '역사 · 건물',
+    body: [
+      '붉은 벽돌로 지은 오래된 건물로, 1908년에 지어졌어요.',
+      '배로 들어오고 나가는 물건을 검사하고 세금을 걷던 곳이에요.',
+      '지금은 옛 모습을 지켜 문화유산으로 보존하고 있어요.',
+    ],
+    ask: '항구 바로 옆에 세관이 있었던 까닭은 무엇일까요?',
+  },
+  '풍력발전기': {
+    tag: '산업 · 에너지',
+    body: [
+      '바람의 힘으로 날개를 돌려 전기를 만드는 시설이에요.',
+      '바닷가는 바람이 세고 막힌 곳이 없어 풍력발전기를 세우기 좋아요.',
+      '‘바람’ 슬라이더를 움직이면 날개가 빨라지거나 느려져요.',
+    ],
+    ask: '바람처럼 자연을 이용하는 시설을 더 떠올려 볼까요?',
+  },
+});
+Object.assign(PLACES_EN, {
+  '명사십리 해변': { name: 'Myeongsasimni Beach', tag: 'Nature · Land',
+    body: ['This is a beach with soft sand on Seonyudo Island.',
+      'Myeongsasimni means “a place where fine sand goes on for a long way.”',
+      'Waves and wind piled up sand for a long time and made the beach.'],
+    ask: 'What did people build because of the beach? Find the beach umbrellas!',
+    words: [['beach', '해변'], ['sand', '모래'], ['wave', '파도'], ['wind', '바람']] },
+  '구 군산세관': { name: 'Old Gunsan Customs House', tag: 'History · Building',
+    body: ['This is an old red brick building. It was built in 1908.',
+      'People checked things that came in and went out by ship, and collected taxes here.',
+      'Today it is kept as a heritage building.'],
+    ask: 'Why was the customs house right next to the port?',
+    words: [['building', '건물'], ['brick', '벽돌'], ['port', '항구'], ['old', '오래된']] },
+  '풍력발전기': { name: 'Wind Turbines', tag: 'Industry · Energy',
+    body: ['Wind turns the blades, and the turbine makes electricity.',
+      'The seaside is windy and open, so it is a good place for wind turbines.',
+      'Move the wind slider. The blades turn faster or slower.'],
+    ask: 'What other things use nature to help people?',
+    words: [['wind', '바람'], ['electricity', '전기'], ['blade', '날개'], ['windy', '바람이 센']] },
+});
+
+// 장소마다 자연환경/인문환경 구분, 그 까닭, 자연↔인문 연결 고리
+export const ENV = {
+  '갯벌': { type: 'nature', why: '바닷물이 드나들며 저절로 생긴 땅이에요.', link: '갯벌(자연환경)에서 조개·게를 잡는 어업(인문환경)이 이루어져요.' },
+  '선유도 망주봉': { type: 'nature', why: '사람이 만들지 않은 섬과 바위산이에요.', link: '아름다운 섬과 바위(자연환경) 덕분에 관광지(인문환경)가 생겼어요.' },
+  '명사십리 해변': { type: 'nature', why: '파도와 바람이 모래를 쌓아 저절로 생긴 해변이에요.', link: '모래 해변(자연환경)이 있어서 해수욕장과 파라솔(인문환경)이 생겼어요.' },
+  '내항 뜬다리부두': { type: 'human', why: '사람이 배를 대려고 만든 시설이에요.', link: '밀물·썰물 차이가 큰 바다(자연환경) 때문에 물에 뜨는 부두(인문환경)를 만들었어요.' },
+  '구 군산세관': { type: 'human', why: '사람이 지은 건물이에요.', link: '배가 드나드는 바닷가(자연환경)에 항구가 생기자 세관(인문환경)도 지었어요.' },
+  '군산조선소 골리앗 크레인': { type: 'human', why: '사람이 배를 만들려고 세운 공장과 기계예요.', link: '넓은 바다(자연환경)가 가까워서 큰 배를 만들어 바로 바다에 띄울 수 있어요.' },
+  '새만금방조제': { type: 'human', why: '사람이 바다를 막으려고 쌓은 둑이에요.', link: '사람이 만든 방조제(인문환경)가 갯벌과 바다(자연환경)의 모습을 바꾸었어요.' },
+  '고군산대교': { type: 'human', why: '사람이 섬과 섬을 이으려고 놓은 다리예요.', link: '바다로 떨어진 섬들(자연환경) 때문에 다리(인문환경)가 필요했어요.' },
+  '십이동파도 청자 난파선': { type: 'human', why: '옛날 사람들이 만든 배와 청자로, 사람이 남긴 문화유산이에요.', link: '서해 바닷길(자연환경)을 따라 청자를 배로 실어 날랐어요.' },
+  '풍력발전기': { type: 'human', why: '사람이 전기를 만들려고 세운 시설이에요.', link: '바닷가의 센 바람(자연환경)을 이용해 전기(인문환경)를 만들어요.' },
+};
+export const ENV_NAME = { nature: { ko: '자연환경', en: 'Natural environment', icon: '🌿' }, human: { ko: '인문환경', en: 'Human environment', icon: '🏗️' } };

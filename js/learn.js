@@ -1,7 +1,7 @@
 // learn.js — 교육 기능: ① 장소 카드 ② 물때 실험 ③ 탐험 미션 ⑥ 영어 모드(카드·이름표·물때 판)
 import { heightAt, lastId, HX, HZ } from './terrain.js';
 import { NX, NZ, CELL } from './water.js';
-import { PLACES, PLACES_EN, MISSIONS, TIDE_RANGE_M } from './places.js';
+import { PLACES, PLACES_EN, MISSIONS, TIDE_RANGE_M, ENV, ENV_NAME } from './places.js';
 
 const KEY = 'gunsan-jelly-learn-v1';
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
@@ -85,6 +85,8 @@ export function setupLearning({ labels, water, stats, tideSlider, focus, audio }
     showToast(n === MISSIONS.length ? '🎉 <b>모든 미션 완료!</b> 군산 탐험가가 되었어요' : `⭐ <b>미션 완료</b> ${m.text}`);
   }
   const extra = {};   // 다른 모듈이 알려 주는 진행 수 (예: 둘러본 시대 수)
+  const cardsGoal = labels.filter(l => PLACES[l.name]).length;   // 이름표 수만큼
+  MISSIONS.find(m => m.id === 'cards').goal = cardsGoal;
   function progress(m) {
     if (m.id in extra) return extra[m.id];
     if (m.id === 'cards') return seen.size;
@@ -100,14 +102,14 @@ export function setupLearning({ labels, water, stats, tideSlider, focus, audio }
       const p = progress(m); li.querySelector('em').textContent = m.goal && !d && p != null ? `${p}/${m.goal}` : '';
     }
     box.querySelector('.ms-count').textContent = `${n}/${MISSIONS.length}`;
-    for (const l of labels) { l.el.classList.toggle('seen', seen.has(l.name)); l.el.textContent = lang === 'en' && PLACES_EN[l.name] ? PLACES_EN[l.name].name : l.name; }
+    for (const l of labels) { l.el.classList.toggle('seen', seen.has(l.name)); const ev = ENV[l.name]; l.el.classList.toggle('env-nature', ev?.type === 'nature'); l.el.classList.toggle('env-human', ev?.type === 'human'); l.el.textContent = lang === 'en' && PLACES_EN[l.name] ? PLACES_EN[l.name].name : l.name; }
   }
   box.querySelector('.ms-reset').onclick = () => { save.done = {}; seen.clear(); heard.clear(); persist(); render(); showToast('미션을 처음부터 시작해요'); };
 
   // ── ① 장소 카드
   const card = el('section', 'place-card', `
     <button type="button" class="pc-x" aria-label="닫기">✕</button>
-    <small class="pc-tag"></small><h3></h3><ul class="pc-body"></ul>
+    <small class="pc-tag"></small><h3></h3><ul class="pc-body"></ul><div class="pc-env"></div>
     <div class="pc-ask"><b>생각해 보기</b><p></p></div><div class="pc-words"></div>
     <div class="pc-btns"><button type="button" class="pc-say">🔊 Listen</button><button type="button" class="pc-go">가까이 보기</button><button type="button" class="pc-tide">물때 바꿔 보기</button></div>`);
   card.setAttribute('aria-live', 'polite'); document.body.appendChild(card);
@@ -124,6 +126,9 @@ export function setupLearning({ labels, water, stats, tideSlider, focus, audio }
     C('.pc-ask b').textContent = e ? 'Think about it · 생각해 보기' : '생각해 보기';
     C('.pc-ask p').innerHTML = e ? `${e.ask}<small>${p.ask}</small>` : p.ask;
     C('.pc-words').innerHTML = e ? `<b>Words</b>${e.words.map(([w, k], i) => `<button type="button" class="word" data-w="${i}">${w}<small>${k}</small></button>`).join('')}` : '';
+    const ev = ENV[l.name], EN = ev && ENV_NAME[ev.type];
+    C('.pc-env').className = 'pc-env' + (ev ? ' ' + ev.type : '');
+    C('.pc-env').innerHTML = ev ? `<p class="pe-type"><b>${EN.icon} ${e ? `${EN.en} <small>${EN.ko}</small>` : EN.ko}</b> ${ev.why}</p><p class="pe-link">🔗 ${ev.link}</p>` : '';
     C('.pc-say').style.display = e ? '' : 'none';
     C('.pc-go').textContent = e ? 'Zoom in' : '가까이 보기';
     C('.pc-tide').textContent = e ? 'Try the tide' : '물때 바꿔 보기';
@@ -172,7 +177,7 @@ export function setupLearning({ labels, water, stats, tideSlider, focus, audio }
   tideSlider.addEventListener('input', checkTide);
   function update() {
     checkTide();
-    if (seen.size >= 7) complete('cards');
+    if (seen.size >= cardsGoal) complete('cards');
     if (stats.launch >= 1) complete('launch');
     if (stats.laps >= 1) complete('laps');
     if (stats.fed !== lastFed) { lastFed = stats.fed; if (stats.fed >= 3) complete('fed'); render(); }

@@ -304,3 +304,36 @@ body.mobile.present .place-card { bottom:84px; top:auto; max-height:calc(100% - 
 body.mobile.present .place-card h3 { font-size:19px; }
 body.mobile.present .place-card .pc-body, body.mobile.present .place-card.en .pc-body li span { font-size:14.5px; }
 body.mobile .present-bar { bottom:8px; }
+
+/* ⑧ 자연환경 · 인문환경 */
+.pill.env-nature { box-shadow:inset 0 1.5px 0 rgba(255,255,255,.85), inset 0 -2px 3px color-mix(in srgb,var(--j3) 30%,transparent), 0 2px 0 #3e9a5c, 0 6px 12px rgba(60,40,20,.14); }
+.pill.env-human { box-shadow:inset 0 1.5px 0 rgba(255,255,255,.85), inset 0 -2px 3px color-mix(in srgb,var(--j3) 30%,transparent), 0 2px 0 #d07a2a, 0 6px 12px rgba(60,40,20,.14); }
+.pill.env-nature::after { background:#3e9a5c; } .pill.env-human::after { background:#d07a2a; }
+body:has(.env-seg [data-f="nature"].on) .pill.env-nature, body:has(.env-seg [data-f="human"].on) .pill.env-human { outline:2.5px solid #fff; }
+.pill.env-hide { opacity:0 !important; pointer-events:none !important; }
+.env-seg { display:grid; grid-template-columns:.8fr 1.1fr 1.1fr; gap:4px; padding:3px; border-radius:12px; background:rgba(120,90,60,.08); }
+.env-seg button { border:0; border-radius:9px; padding:7px 0; font-size:12.5px; background:none; }
+.env-seg button.on { background:#fff; color:var(--j3); box-shadow:0 1px 0 rgba(90,60,30,.12), 0 3px 8px rgba(90,60,30,.1); }
+.env-play { width:100%; margin-top:6px; border:0; border-radius:12px; padding:9px 0; font-size:14px; background:#eaf6ec; color:#2f7a45; box-shadow:inset 0 -3px 0 rgba(47,122,69,.15); }
+.env-note { margin:6px 2px 0; font-size:11px; line-height:1.55; color:#8b7e70; }
+.pc-env { margin:0 0 10px; padding:9px 11px; border-radius:13px; font-size:13px; line-height:1.5; }
+.pc-env:empty { display:none; }
+.pc-env.nature { background:#eaf6ec; } .pc-env.human { background:#fdf0e3; }
+.pc-env p { margin:0; }
+.pc-env .pe-type b { font-weight:400; margin-right:4px; }
+.pc-env.nature .pe-type b { color:#2f7a45; } .pc-env.human .pe-type b { color:#b0601c; }
+.pc-env .pe-type small { font-size:11px; color:#8b7e70; }
+.pc-env .pe-link { margin-top:4px; color:#5c5148; }
+body.present .place-card .pc-env { font-size:15.5px; }
+.sort-game { max-height:calc(100% - 36px); overflow:auto; }
+.sort-game h3 { margin:6px 0 10px; }
+.sg-list { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.sg-list li { display:grid; grid-template-columns:1fr auto; align-items:center; gap:4px 8px; padding:8px 10px; border-radius:13px; background:#fff; box-shadow:0 1px 0 rgba(90,60,30,.1); }
+.sg-name { font-size:14.5px; }
+.sg-btns { display:flex; gap:5px; }
+.sg-btns button { border:2px solid transparent; border-radius:10px; padding:6px 10px; font-size:13px; background:rgba(120,90,60,.08); }
+.sg-btns button:disabled { opacity:.45; cursor:default; }
+.sg-why { grid-column:1 / -1; font-size:12px; color:#6d6257; line-height:1.45; }
+.sg-why:empty { display:none; }
+.sg-list li.ok { background:#eef9f2; } .sg-list li.no { background:#fdf0ee; }
+.sg-end p { margin:12px 0 0; font-size:14px; line-height:1.55; text-align:center; }

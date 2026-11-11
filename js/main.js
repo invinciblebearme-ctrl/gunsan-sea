@@ -10,6 +10,7 @@ import { setupLearning } from './learn.js';
 import { setupQuiz } from './quiz.js';
 import { setupEra } from './era.js';
 import { setupTeacher } from './teacher.js';
+import { setupEnv } from './env.js';
 
 const $ = s => document.querySelector(s);
 const canvas = $('#c');
@@ -206,6 +207,10 @@ const title = $('#title');
 // ── 이름표
 const labelBox = $('#labels');
 world.labels.push({ name: '갯벌', pos: new THREE.Vector3(-11.2, 0.55, coastZ(-11.2) + 1.2) });
+// 자연환경·인문환경 학습용 장소 (장면에 이미 있는 명사십리 해변·구 군산세관·풍력발전기)
+world.labels.push({ name: '명사십리 해변', pos: new THREE.Vector3(-3.9, heightAt(-3.9, 4.15) + 0.45, 4.15) });
+world.labels.push({ name: '구 군산세관', pos: new THREE.Vector3(-4.4, heightAt(-4.4, coastZ(-4.4) - 0.95) + 1.15, coastZ(-4.4) - 0.95) });
+world.labels.push({ name: '풍력발전기', pos: new THREE.Vector3(12.3, heightAt(12.3, -6.0) + 3.25, -6.0) });
 const labels = world.labels.map(l => { const el = document.createElement('div'); el.className = 'pill'; el.textContent = l.name; labelBox.appendChild(el); return { ...l, el }; });
 let showLabels = true;
 function updLabels() {
@@ -267,6 +272,7 @@ function focusOn(pos) {
 const learn = setupLearning({ labels, water, stats, tideSlider: sl.tide, focus: focusOn, audio });
 const quiz = setupQuiz({ learn, labels, focus: focusOn, audio });
 const era = setupEra({ terrain, water, world, life, labels, learn, kick: a => kick(a), audio });
+const envEdu = setupEnv({ labels, learn, audio });
 const teacher = setupTeacher({ labels, learn, focus: focusOn, overview: () => setView(0) });
 function kick(a) { jelly.vx += a * 9; jelly.vz -= a * 5; audio.wobble(a); }
 
@@ -297,5 +303,5 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 setTimeout(() => kick(0.12), 500);
-let frames = 0; const _f = frame; window.__jelly = { learn, quiz, era, teacher, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
+let frames = 0; const _f = frame; window.__jelly = { learn, quiz, era, teacher, envEdu, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
 document.body.classList.add('ready');
