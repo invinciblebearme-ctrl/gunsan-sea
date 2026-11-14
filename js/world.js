@@ -293,8 +293,12 @@ export function buildWorld(root, water) {
       add(pile, px, py, pz); eras.rice.push(pile); pile.visible = false;
     }
   }
+  let eraOn = { shipyard: true, seawall: true, bridge: true, rice: false };
   function setEra(on) {   // on: { shipyard, seawall, bridge, rice } → true/false
+    eraOn = { ...on };
     for (const k in eras) for (const o of eras[k]) o.visible = !!on[k];
   }
-  return { group: g, labels, setEra, update(dt, t, s) { for (const u of updaters) u(dt, t, s); } };
+  // 걸어서 탐방용: 사람이 걸을 수 있는 다리·도로 (roadPaths 의 점 높이 = 도로 윗면)
+  const decks = [{ key: 'seawall', name: '새만금방조제', poly: roadPaths[0], half: 0.17 }, { key: 'bridge', name: '고군산대교', poly: roadPaths[1], half: 0.2 }];
+  return { group: g, labels, setEra, decks, get eraOn() { return eraOn; }, update(dt, t, s) { for (const u of updaters) u(dt, t, s); } };
 }

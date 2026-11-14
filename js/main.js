@@ -225,7 +225,7 @@ function updLabels() {
     P.copy(l.pos).applyMatrix4(root.matrixWorld).project(camera);
     const x = (P.x * 0.5 + 0.5) * layout.W, y = (-P.y * 0.5 + 0.5) * layout.H;
     l.el.style.transform = `translate(-50%,-100%) translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
-    const vis = !l.off && P.z < 1 && x > 20 && x < layout.W - 20 && y > 20 && y < layout.H - 10;
+    const vis = !l.off && !l.far && P.z < 1 && x > 20 && x < layout.W - 20 && y > 20 && y < layout.H - 10;
     l.el.style.opacity = vis ? 1 : 0; l.el.style.pointerEvents = vis ? '' : 'none';
   }
 }
@@ -281,7 +281,7 @@ const era = setupEra({ terrain, water, world, life, labels, learn, kick: a => ki
 const envEdu = setupEnv({ labels, learn, audio });
 const record = setupRecord({ labels });
 const manual = setupManual();
-const walk = setupWalk({ camera, scene, root, canvas, water, learn });
+const walk = setupWalk({ camera, scene, root, canvas, water, learn, world, labels });
 const teacher = setupTeacher({ labels, learn, focus: focusOn, overview: () => setView(0) });
 function kick(a) { jelly.vx += a * 9; jelly.vz -= a * 5; audio.wobble(a); }
 
