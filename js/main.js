@@ -295,6 +295,7 @@ function frame(now) {
     if (SIMX > 1) dt = 1 / 30;
     T += dt; uniforms.uTime.value = T; env.launching = life.state.launching;
     stepJelly(dt); water.step(dt, T, { x: jelly.ax, z: jelly.az }); water.updateMesh();
+    env.walker = walk.on && !walk.riding ? walk.pos : null;   // 걷는 사람 가까이 오면 차가 멈춤
     life.update(dt, T, env); world.update(dt, T, env); spray.update(dt);
     // 해안에 부딪히는 물보라
     coastT -= dt;
@@ -312,5 +313,5 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 setTimeout(() => kick(0.12), 500);
-let frames = 0; const _f = frame; window.__jelly = { walk, learn, quiz, era, teacher, envEdu, record, manual, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
+let frames = 0; const _f = frame; window.__jelly = { walk, world, learn, quiz, era, teacher, envEdu, record, manual, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
 document.body.classList.add('ready');

@@ -11,16 +11,16 @@ import { heightAt, lastId, coastZ, HX, HZ } from './terrain.js';
 const EYE = 0.075;           // 눈높이 (집 높이 0.15~0.27 기준으로 사람 크기)
 const SPEED = 0.55, RUN = 2; // 걷는 속도(블록 단위/초), Shift 배수
 const SLOPE = 1.6;           // 오를 수 있는 가장 가파른 경사 (높이/거리)
-const NEAR = 1.1;            // 장소 '가까이 왔어요' 거리
+const NEAR = 1.5;            // 장소 '가까이 왔어요' 거리
 const LABEL_FAR = 7;         // 이 거리보다 먼 이름표는 숨김
 const SKY = 0xbfe2f5, FOG = 0xd3eaf6;
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
 
 // 처음 들어설 때 한 번 보여 주는 안내 (장소 이름 → 문장)
 const TIPS = {
-  '새만금방조제': '🧱 새만금방조제 위를 걷고 있어요. 실제 길이는 약 33.9km라서, 사람이 걸으면 8시간이 넘게 걸려요.',
-  '고군산대교': '🌉 고군산대교를 건너요. 이 다리가 생기기 전에는 배를 타야만 섬에 갈 수 있었어요.',
-  '갯벌': '🦀 갯벌이에요. 썰물 때 넓게 드러나고, 밀물 때는 물에 잠겨요. 물때 슬라이더로 바꿔 볼 수 있어요.',
+  '새만금방조제': '🧱 새만금방조제 위를 걷고 있어요. 실제 길이는 약 33.9km라서, 사람이 걸으면 8시간이 넘게 걸려요. 실제 방조제 도로는 차가 빠르게 달리니, 꼭 인도로 다녀요.',
+  '고군산대교': '🌉 고군산대교를 건너요. 이 다리가 생기기 전에는 배를 타야만 섬에 갈 수 있었어요. 실제 다리 위에서는 차도로 내려가지 말고 인도로만 걸어요.',
+  '갯벌': '🦀 갯벌이에요. 썰물 때 넓게 드러나고, 밀물 때는 물에 잠겨요. 위쪽 🌊 물때를 움직여 바꿔 보세요.',
   '신시도': '🏝️ 신시도에 왔어요. 방조제와 다리로 육지와 이어진 섬이에요.',
   '선유도': '⛰️ 선유도예요. 가운데 우뚝 솟은 두 바위 봉우리가 망주봉이에요.',
   '명사십리 해변': '🏖️ 고운 모래가 길게 이어진 명사십리 해변이에요. 파라솔을 찾아보세요.',
@@ -28,7 +28,7 @@ const TIPS = {
 
 export function setupWalk({ camera, scene, root, canvas, water, learn, world, labels }) {
   let on = false, yaw = 0, pitch = -0.05, x = 0, z = 0, y = 0, bob = 0, saved = null, place = '', near = null;
-  let tour = null, ride = null, tipT = 0;
+  let tour = null, ride = null, tipT = 0, safeT = 0;
   const keys = new Set(), joy = { x: 0, y: 0, id: null }, look = { id: null, px: 0, py: 0 }, tipped = new Set();
   const touch = matchMedia('(pointer: coarse)').matches;
 
@@ -48,7 +48,9 @@ export function setupWalk({ camera, scene, root, canvas, water, learn, world, la
   }
   // 다리 위에 서 있는 주탑·뒤 기둥 (지나갈 수 없음): world.js 고군산대교의 주탑이 도로 높이를 지나는 곳
   const POSTS = [{ x: 6.11, z: 5.82, r: 0.13 }, { x: 6.93, z: 5.86, r: 0.1 }];
-  const blocked = (px, pz) => world.eraOn.bridge && POSTS.some(o => Math.hypot(px - o.x, pz - o.z) < o.r);
+  const CAR_R = 0.1;   // 차 둘레 (사람이 차를 뚫고 지나가지 않게)
+  const blocked = (px, pz) => (world.eraOn.bridge && POSTS.some(o => Math.hypot(px - o.x, pz - o.z) < o.r))
+    || (!tour && world.carSpots().some(c => Math.hypot(px - c.x, pz - c.z) < CAR_R));   // 자동 탐방은 멈춘 차 옆을 지나감 (서로 기다리며 멈추지 않게)
   const ground = (px, pz) => { const t = heightAt(px, pz), d = deckAt(px, pz); return d && d.h > t ? d.h : t; };
   function placeName(px, pz) {
     const d = deckAt(px, pz), t = heightAt(px, pz), id = lastId();
@@ -64,12 +66,18 @@ export function setupWalk({ camera, scene, root, canvas, water, learn, world, la
       <button type="button" class="wh-tour">🧭 자동 탐방</button><button type="button" class="wh-exit">나가기</button></div>
     <p class="wh-help">${touch ? '왼쪽 아래 동그라미로 걷기 · 화면을 끌어 둘러보기'
       : '<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 걷기 · 화면 클릭 후 마우스로 둘러보기 · <kbd>Shift</kbd> 빨리 · <kbd>E</kbd> 카드 · <kbd>F</kbd> 배 · <kbd>Esc</kbd> 나가기'}</p>
-    <p class="wh-tip" hidden></p>`);
+    <div class="wh-tide"><span>🌊 물때</span><small>썰물</small><input type="range" min="0" max="100" aria-label="물때 (썰물에서 밀물까지)"><small>밀물</small><b class="wh-tide-v"></b></div>
+    <p class="wh-tip" hidden></p>
+    <p class="wh-safe" hidden>🚗 차가 멈춰 기다려 줬어요. <b>실제 도로에서는 차가 멈추지 않을 수 있어요!</b> 도로에서는 인도로 걷고, 길을 건널 때는 횡단보도에서 좌우를 꼭 살펴요.</p>`);
   const bar = el('div', 'walk-near', '<span class="wn-text"></span><button type="button" class="wn-card">카드 보기</button><button type="button" class="wn-ferry">⛴️ 배 타기</button><button type="button" class="wn-go">계속 ▶</button>');
   const stick = el('div', 'walk-stick', '<i></i>');
   document.body.append(hud, bar, stick);
   const $ = s => document.querySelector(s), knob = stick.querySelector('i');
   if (touch) stick.classList.add('show');
+  // 걷는 중 물때 조절: 패널의 물때 슬라이더와 같은 값을 씀 (패널은 걷는 동안 숨겨짐)
+  const panelTide = document.querySelector('#sTide'), hudTide = hud.querySelector('.wh-tide input');
+  const tideText = () => { const v = +panelTide.value; hudTide.style.setProperty('--p', v + '%'); hud.querySelector('.wh-tide-v').textContent = `${v < 30 ? '썰물' : v > 70 ? '밀물' : '중간'} · 갯벌 ${learn.exposedPct()}%`; };
+  hudTide.addEventListener('input', () => { panelTide.value = hudTide.value; panelTide.dispatchEvent(new Event('input')); tideText(); });
   function tip(t) { const e = $('.wh-tip'); e.textContent = t; e.hidden = false; tipT = 7; }
 
   // ── 4단계: 배 (내항 부두 ↔ 선유도 북쪽 바닷가)
@@ -179,7 +187,8 @@ export function setupWalk({ camera, scene, root, canvas, water, learn, world, la
     camera.fov = 68; camera.near = 0.005; camera.far = 45; camera.clearViewOffset(); camera.updateProjectionMatrix();
     scene.background = new THREE.Color(SKY); scene.fog = new THREE.Fog(FOG, 5, 28);
     learn.closeCard(); document.body.classList.add('walking'); document.body.classList.remove('panel-open');
-    spawn(); place = ''; near = null; keys.clear(); tipped.clear(); tour = null; ride = null; boat.visible = false; $('.wh-tip').hidden = true; showBar();
+    hudTide.value = panelTide.value; tideText();
+    spawn(); place = ''; near = null; keys.clear(); tipped.clear(); tour = null; ride = null; boat.visible = false; $('.wh-tip').hidden = true; $('.wh-safe').hidden = true; safeT = 0; showBar();
   }
   function exit() {
     if (!on) return; on = false;
@@ -195,10 +204,12 @@ export function setupWalk({ camera, scene, root, canvas, water, learn, world, la
   hud.querySelector('.wh-exit').onclick = exit;
 
   // ── 키보드
+  let escHadCard = false;
+  window.addEventListener('keydown', e => { if (e.code === 'Escape') escHadCard = learn.isOpen(); }, true);
   const K = { KeyW: 'f', ArrowUp: 'f', KeyS: 'b', ArrowDown: 'b', KeyA: 'l', ArrowLeft: 'l', KeyD: 'r', ArrowRight: 'r' };
   window.addEventListener('keydown', e => {
     if (!on || e.target.closest?.('input, textarea')) return;
-    if (e.code === 'Escape') { if (!document.pointerLockElement) exit(); return; }
+    if (e.code === 'Escape') { if (!document.pointerLockElement && !escHadCard) exit(); return; }   // 카드가 열려 있었으면 카드만 닫힘
     if (e.code === 'KeyE') { openNear(); return; }
     if (e.code === 'KeyF') { const k = +bar.dataset.dock; if (k >= 0 && !ride) startFerry(k); return; }
     if ((e.code === 'Enter' || e.code === 'Space') && tour?.wait && !ride) { e.preventDefault(); nextStop(); return; }
@@ -266,6 +277,7 @@ export function setupWalk({ camera, scene, root, canvas, water, learn, world, la
     const n = ride ? '바다 위 (배)' : placeName(x, z);
     if (n !== place) { place = n; $('.wh-place').textContent = n ? `📍 ${n}` : ''; if (!tour && TIPS[n] && !tipped.has(n)) { tipped.add(n); tip(TIPS[n]); } if (tour && TIPS[n]) tipped.add(n); }
     if (tipT > 0 && (tipT -= dt) <= 0) $('.wh-tip').hidden = true;
+    if (world.carNear > 0 && !ride) safeT = 6; const sf = $('.wh-safe'); if (safeT > 0) { safeT -= dt; if (sf.hidden) sf.hidden = false; } else if (!sf.hidden) sf.hidden = true;
 
     // 가까운 장소 · 먼 이름표 숨기기
     let best = null, bd = NEAR;
@@ -279,5 +291,5 @@ export function setupWalk({ camera, scene, root, canvas, water, learn, world, la
   function teleport(nx, nz, nyaw = yaw) { x = nx; z = nz; yaw = nyaw; y = ground(x, z) + EYE; }
   return { enter, exit, update, teleport, startTour, stopTour, nextStop, startFerry, ground, docks: DOCKS,
     get on() { return on; }, get touring() { return tour ? { i: tour.i, wait: tour.wait, n: tour.route.length } : null; }, get riding() { return !!ride; },
-    get pos() { return { x, z, y, yaw, place, near: near?.name || null }; } };
+    get pos() { return { x, z, y, yaw, place, near: near?.name || null }; }, get safety() { return !$('.wh-safe').hidden; } };
 }
