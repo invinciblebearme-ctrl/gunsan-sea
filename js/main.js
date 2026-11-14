@@ -13,6 +13,7 @@ import { setupTeacher } from './teacher.js';
 import { setupEnv } from './env.js';
 import { setupRecord } from './record.js';
 import { setupManual } from './manual.js';
+import { setupWalk } from './walk.js';
 
 const $ = s => document.querySelector(s);
 const canvas = $('#c');
@@ -149,6 +150,7 @@ function classify(ev, out) {
 const ptrs = new Map(); let mode = null, last = { x: 0, y: 0 }, lastSea = new THREE.Vector3(), pinch = 0, tap = { t: 0, x: 0, y: 0 }, downAt = { x: 0, y: 0, t: 0 }, swishT = 0, grabbed = 0;
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 canvas.addEventListener('pointerdown', ev => {
+  if (walk.on) return;   // 걷기 모드에서는 walk.js 가 입력을 처리
   audio.init(); canvas.setPointerCapture(ev.pointerId); ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
   if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); if (mode === 'jelly') releaseJelly(); mode = 'pinch'; return; }
   last = { x: ev.clientX, y: ev.clientY }; downAt = { x: ev.clientX, y: ev.clientY, t: performance.now() }; orb.goal = null;
@@ -161,6 +163,7 @@ function releaseJelly() {
   const amt = Math.hypot(jelly.sx, jelly.sz); if (amt > 0.02) audio.wobble(amt * 2);
 }
 canvas.addEventListener('pointermove', ev => {
+  if (walk.on) return;
   if (!ptrs.has(ev.pointerId)) return; ptrs.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
   if (mode === 'pinch' && ptrs.size >= 2) {
     const [a, b] = [...ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch > 0) orb.dist *= pinch / d; pinch = d; return;
@@ -184,6 +187,7 @@ canvas.addEventListener('pointermove', ev => {
   }
 });
 function endPtr(ev) {
+  if (walk.on) { ptrs.clear(); mode = null; return; }
   if (!ptrs.has(ev.pointerId)) return; ptrs.delete(ev.pointerId);
   if (mode === 'jelly') releaseJelly();
   const now = performance.now(), still = Math.hypot(ev.clientX - downAt.x, ev.clientY - downAt.y) < 9 && now - downAt.t < 350;
@@ -195,7 +199,7 @@ function endPtr(ev) {
   if (ptrs.size === 0) mode = null; else if (ptrs.size === 1) { mode = 'orbit'; const p = [...ptrs.values()][0]; last = { x: p.x, y: p.y }; }
 }
 canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr);
-canvas.addEventListener('wheel', ev => { ev.preventDefault(); orb.goal = null; orb.dist *= Math.exp(ev.deltaY * 0.0012); }, { passive: false });
+canvas.addEventListener('wheel', ev => { ev.preventDefault(); if (walk.on) return; orb.goal = null; orb.dist *= Math.exp(ev.deltaY * 0.0012); }, { passive: false });
 document.addEventListener('pointerdown', () => audio.init(), { once: true });
 
 // ── 제목: 글자 한 알씩 젤리
@@ -221,7 +225,7 @@ function updLabels() {
     P.copy(l.pos).applyMatrix4(root.matrixWorld).project(camera);
     const x = (P.x * 0.5 + 0.5) * layout.W, y = (-P.y * 0.5 + 0.5) * layout.H;
     l.el.style.transform = `translate(-50%,-100%) translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
-    const vis = !l.off && P.z < 1 && x > 20 && x < layout.W - 20 && y > 20 && y < layout.H - 10;
+    const vis = !l.off && !l.far && P.z < 1 && x > 20 && x < layout.W - 20 && y > 20 && y < layout.H - 10;
     l.el.style.opacity = vis ? 1 : 0; l.el.style.pointerEvents = vis ? '' : 'none';
   }
 }
@@ -277,6 +281,7 @@ const era = setupEra({ terrain, water, world, life, labels, learn, kick: a => ki
 const envEdu = setupEnv({ labels, learn, audio });
 const record = setupRecord({ labels });
 const manual = setupManual();
+const walk = setupWalk({ camera, scene, root, canvas, water, learn, world, labels });
 const teacher = setupTeacher({ labels, learn, focus: focusOn, overview: () => setView(0) });
 function kick(a) { jelly.vx += a * 9; jelly.vz -= a * 5; audio.wobble(a); }
 
@@ -290,6 +295,7 @@ function frame(now) {
     if (SIMX > 1) dt = 1 / 30;
     T += dt; uniforms.uTime.value = T; env.launching = life.state.launching;
     stepJelly(dt); water.step(dt, T, { x: jelly.ax, z: jelly.az }); water.updateMesh();
+    env.walker = walk.on && !walk.riding ? walk.pos : null;   // 걷는 사람 가까이 오면 차가 멈춤
     life.update(dt, T, env); world.update(dt, T, env); spray.update(dt);
     // 해안에 부딪히는 물보라
     coastT -= dt;
@@ -302,10 +308,10 @@ function frame(now) {
     }
     bLaunch.disabled = life.busy || !era.launchOK; updStats();
   }
-  applyShear(); updCamera(dt); renderer.render(scene, camera); updLabels(); learn.update(); frames++;
+  applyShear(); if (walk.on) walk.update(dt); else updCamera(dt); renderer.render(scene, camera); updLabels(); learn.update(); frames++;
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 setTimeout(() => kick(0.12), 500);
-let frames = 0; const _f = frame; window.__jelly = { learn, quiz, era, teacher, envEdu, record, manual, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
+let frames = 0; const _f = frame; window.__jelly = { walk, world, learn, quiz, era, teacher, envEdu, record, manual, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
 document.body.classList.add('ready');

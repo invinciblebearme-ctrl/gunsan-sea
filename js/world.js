@@ -173,8 +173,12 @@ export function buildWorld(root, water) {
     }
   });
   const cp = V(), cd = V();
-  updaters.push((dt) => {
+  // 걸어서 탐방: 사람(s.walker)이 가까이 있으면 차가 멈춤 → carNear 로 알려 줌 (walk.js 가 안전 안내를 띄움)
+  const CAR_STOP = 0.45; let carNear = 0;
+  updaters.push((dt, t, s) => {
+    const w = s && s.walker; carNear = 0;
     for (const c of cars) {
+      if (w && c.c.visible && Math.hypot(c.c.position.x - w.x, c.c.position.z - w.z) < CAR_STOP && Math.abs(c.c.position.y - (w.y - 0.075)) < 0.3) { carNear++; continue; }
       c.d += c.dir * c.sp * dt; if (c.d > c.path.total) { c.d = c.path.total; c.dir = -1; } if (c.d < 0) { c.d = 0; c.dir = 1; }
       c.path.at(c.d, cp, cd); if (c.dir < 0) cd.multiplyScalar(-1);
       const side = 0.085; c.c.position.set(cp.x - cd.z * side, cp.y, cp.z + cd.x * side);
@@ -293,8 +297,14 @@ export function buildWorld(root, water) {
       add(pile, px, py, pz); eras.rice.push(pile); pile.visible = false;
     }
   }
+  let eraOn = { shipyard: true, seawall: true, bridge: true, rice: false };
   function setEra(on) {   // on: { shipyard, seawall, bridge, rice } → true/false
+    eraOn = { ...on };
     for (const k in eras) for (const o of eras[k]) o.visible = !!on[k];
   }
-  return { group: g, labels, setEra, update(dt, t, s) { for (const u of updaters) u(dt, t, s); } };
+  // 걸어서 탐방용: 사람이 걸을 수 있는 다리·도로 (roadPaths 의 점 높이 = 도로 윗면)
+  const decks = [{ key: 'seawall', name: '새만금방조제', poly: roadPaths[0], half: 0.17 }, { key: 'bridge', name: '고군산대교', poly: roadPaths[1], half: 0.2 }];
+  // 걷는 사람이 지나갈 수 없는 차 위치 (보이는 차만)
+  const carSpots = () => cars.filter(c => c.c.visible).map(c => c.c.position);
+  return { group: g, labels, setEra, decks, carSpots, get carNear() { return carNear; }, get eraOn() { return eraOn; }, update(dt, t, s) { for (const u of updaters) u(dt, t, s); } };
 }
