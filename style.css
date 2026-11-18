@@ -469,3 +469,12 @@ body.mobile .wh-tide input { max-width:none; }
 .mp-chip .mp-leave { margin-left:auto; border:0; border-radius:9px; padding:5px 10px; font-size:12px; background:#fff; color:#4c5bd4; }
 body.mobile .wh-top .wh-mp { margin-left:0; }
 body.mobile .mp-box input { width:96px; }
+.mp-t { margin-top:10px; padding-top:8px; border-top:1px dashed rgba(76,91,212,.25); }
+.mp-t summary { cursor:pointer; font-size:12.5px; color:#8b7e70; }
+.mp-t[open] summary { color:#b07800; margin-bottom:6px; }
+.mp-t .mp-key { width:150px; }
+.mp-t .mp-open { background:#f2b705; color:#3a2a00; }
+.mp-note { margin:6px 0 0; font-size:11.5px; color:#8b7e70; line-height:1.45; }
+.mp-chip .mp-shut { margin-left:auto; border:0; border-radius:9px; padding:5px 10px; font-size:12px; background:#f2b705; color:#3a2a00; }
+.mp-chip .mp-shut + .mp-leave { margin-left:4px; }
+.mp-chip .mp-shut[hidden] + .mp-leave { margin-left:auto; }

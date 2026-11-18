@@ -96,7 +96,10 @@
 - 새 파일: `js/walk.js` / 바뀐 파일: `js/main.js`(걷는 동안 기존 조작 끄기), `js/world.js`(다리·도로 정보), `style.css`
 
 ### 👥 함께 걷기 (`multiplayer` 브랜치)
-- 걸어서 탐방 안에서 **방 코드**(숫자 4~6자리)와 **별명**으로 들어가면 같은 방 친구들이 색깔 캐릭터 + 별명표로 보임.
+- **방 코드는 7703 하나로 고정**, 방은 **선생님만** 열 수 있음 (선생님 비밀번호 = 서버 비밀값 `TEACHER_KEY`, 화면 코드에는 없음).
+  선생님이 방을 열면 학생은 별명만 넣고 들어감. 열리기 전엔 "선생님이 아직 방을 열지 않았어요".
+  선생님이 **방 닫기**를 누르거나 3시간이 지나면 닫히고 모두 나가게 됨. 비밀번호 5번 틀리면 1분 잠금.
+- 같은 방 친구들이 색깔 캐릭터 + 별명표로 보임 (선생님은 👑 노란 캐릭터).
 - 내 위치를 1초에 8번까지 보내고, 친구 캐릭터는 부드럽게 따라 움직임. 들어오고 나가면 알림.
 - 개인정보: 별명만(최대 8자, 기호 제거), 위치 저장 안 함, 모두 나가면 방이 사라짐. 방 최대 40명, 너무 잦은 메시지는 무시.
 - 서버: `server/` 폴더 (Cloudflare Worker + Durable Object, 방 코드마다 방 하나).
@@ -106,9 +109,11 @@
 1. 컴퓨터에 Node.js 설치 → 이 저장소를 내려받은 뒤 `server` 폴더에서 `npm install`
 2. `npx wrangler login` (Cloudflare 계정으로 로그인)
 3. `npx wrangler deploy` → 나오는 주소(예: `https://gunsan-sea-mp.<계정>.workers.dev`) 확인
+3-1. `npx wrangler secret put TEACHER_KEY` → 선생님 비밀번호 입력 (학생이 알 수 없는 것으로, 나중에 같은 명령으로 바꿀 수 있음)
 4. `js/net-config.js` 의 `MP_SERVER` 에 그 주소를 `wss://` 로 바꿔 적고 저장 → 사이트 다시 올리기
    (예: `export const MP_SERVER = 'wss://gunsan-sea-mp.<계정>.workers.dev';`)
 - 시험할 때는 사이트 주소 뒤에 `?mp=wss://...` 를 붙여 다른 서버를 쓸 수 있음.
+- 방 코드를 바꾸려면 `server/wrangler.toml` 의 `ROOM_CODE` 와 `js/net-config.js` 의 `MP_ROOM` 을 같이 바꿈.
 
 ## 파일 안내
 

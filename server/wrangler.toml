@@ -12,3 +12,9 @@ class_name = "Room"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Room"]
+
+# 정해진 방 코드 (학생 화면의 js/net-config.js MP_ROOM 과 같아야 해요)
+[vars]
+ROOM_CODE = "7703"
+
+# 선생님 비밀번호는 여기에 적지 말고, 배포 후 한 번:  npx wrangler secret put TEACHER_KEY
