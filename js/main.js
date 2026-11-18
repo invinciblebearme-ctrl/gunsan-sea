@@ -14,6 +14,7 @@ import { setupEnv } from './env.js';
 import { setupRecord } from './record.js';
 import { setupManual } from './manual.js';
 import { setupWalk } from './walk.js';
+import { setupMulti } from './multi.js';
 
 const $ = s => document.querySelector(s);
 const canvas = $('#c');
@@ -282,6 +283,7 @@ const envEdu = setupEnv({ labels, learn, audio });
 const record = setupRecord({ labels });
 const manual = setupManual();
 const walk = setupWalk({ camera, scene, root, canvas, water, learn, world, labels });
+const multi = setupMulti({ walk, root });   // 👥 함께 걷기
 const teacher = setupTeacher({ labels, learn, focus: focusOn, overview: () => setView(0) });
 function kick(a) { jelly.vx += a * 9; jelly.vz -= a * 5; audio.wobble(a); }
 
@@ -308,10 +310,10 @@ function frame(now) {
     }
     bLaunch.disabled = life.busy || !era.launchOK; updStats();
   }
-  applyShear(); if (walk.on) walk.update(dt); else updCamera(dt); renderer.render(scene, camera); updLabels(); learn.update(); frames++;
+  applyShear(); if (walk.on) walk.update(dt); else updCamera(dt); multi.update(dt); renderer.render(scene, camera); updLabels(); learn.update(); frames++;
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 setTimeout(() => kick(0.12), 500);
-let frames = 0; const _f = frame; window.__jelly = { walk, world, learn, quiz, era, teacher, envEdu, record, manual, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
+let frames = 0; const _f = frame; window.__jelly = { walk, multi, world, learn, quiz, era, teacher, envEdu, record, manual, get frames() { return frames; }, water, life, jelly, orb, setView, setFlavor, stats, kick, get T() { return T; } };
 document.body.classList.add('ready');

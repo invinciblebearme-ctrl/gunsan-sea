@@ -1,0 +1,14 @@
+# Gunsan Jelly 함께 걷기 서버 (Cloudflare Worker + Durable Object)
+# 배포: 이 폴더에서  npx wrangler deploy
+# 배포 후 나오는 주소(예: https://gunsan-sea-mp.<계정>.workers.dev)를 js/net-config.js 의 MP_SERVER 에 wss:// 로 적어 주세요.
+name = "gunsan-sea-mp"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]

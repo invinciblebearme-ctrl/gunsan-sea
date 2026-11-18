@@ -95,6 +95,21 @@
   걷는 중 Esc는 열린 카드만 닫음, 쓸 수 없는 카드 버튼(가까이 보기·물때 바꿔 보기) 숨김, 위쪽에 🌊 물때 조절 추가.
 - 새 파일: `js/walk.js` / 바뀐 파일: `js/main.js`(걷는 동안 기존 조작 끄기), `js/world.js`(다리·도로 정보), `style.css`
 
+### 👥 함께 걷기 (`multiplayer` 브랜치)
+- 걸어서 탐방 안에서 **방 코드**(숫자 4~6자리)와 **별명**으로 들어가면 같은 방 친구들이 색깔 캐릭터 + 별명표로 보임.
+- 내 위치를 1초에 8번까지 보내고, 친구 캐릭터는 부드럽게 따라 움직임. 들어오고 나가면 알림.
+- 개인정보: 별명만(최대 8자, 기호 제거), 위치 저장 안 함, 모두 나가면 방이 사라짐. 방 최대 40명, 너무 잦은 메시지는 무시.
+- 서버: `server/` 폴더 (Cloudflare Worker + Durable Object, 방 코드마다 방 하나).
+- **확인용 아티팩트 페이지에서는 동작하지 않음**(외부 연결 차단). 실제 사이트에서만 됨.
+
+**함께 걷기 서버 배포 (한 번만)**
+1. 컴퓨터에 Node.js 설치 → 이 저장소를 내려받은 뒤 `server` 폴더에서 `npm install`
+2. `npx wrangler login` (Cloudflare 계정으로 로그인)
+3. `npx wrangler deploy` → 나오는 주소(예: `https://gunsan-sea-mp.<계정>.workers.dev`) 확인
+4. `js/net-config.js` 의 `MP_SERVER` 에 그 주소를 `wss://` 로 바꿔 적고 저장 → 사이트 다시 올리기
+   (예: `export const MP_SERVER = 'wss://gunsan-sea-mp.<계정>.workers.dev';`)
+- 시험할 때는 사이트 주소 뒤에 `?mp=wss://...` 를 붙여 다른 서버를 쓸 수 있음.
+
 ## 파일 안내
 
 | 파일 | 하는 일 |
@@ -111,6 +126,8 @@
 | `js/record.js` | 나의 학습 기록 |
 | `js/manual.js` | 사용 설명서 |
 | `js/walk.js` | 걸어서 탐방 (1인칭 걷기 · 자동 탐방 · 배) |
+| `js/multi.js`, `js/net-config.js` | 👥 함께 걷기 (화면 쪽) · 서버 주소 설정 |
+| `server/` | 👥 함께 걷기 서버 (Cloudflare Worker + Durable Object) |
 
 ## 수업 전에 확인해 주세요
 

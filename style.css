@@ -447,3 +447,25 @@ body.walking .place-card .pc-go, body.walking .place-card .pc-tide { display:non
 .wh-safe b { font-weight:400; color:#c0321a; }
 .wh-safe[hidden] { display:none; }
 body.mobile .wh-tide input { max-width:none; }
+
+/* 👥 함께 걷기 */
+.wh-mp { border:0; border-radius:11px; padding:6px 10px; font-size:13px; background:#eef0ff; color:#4c5bd4; }
+.wh-mp.on { background:#4c5bd4; color:#fff; }
+.wh-top .wh-mp { margin-left:auto; }
+.wh-top .wh-mp + .wh-tour { margin-left:4px; }
+.mp-box, .mp-chip { display:none; }
+.mp-box.show { display:block; margin-top:8px; padding:10px 12px; border-radius:14px; background:#f4f5ff; white-space:normal; max-width:520px; font-size:13px; }
+.mp-box > b { font-weight:400; font-size:14px; color:#4c5bd4; }
+.mp-lead { margin:3px 0 8px; color:#5c5148; line-height:1.5; }
+.mp-lead b { font-weight:400; color:#2b2622; }
+.mp-box label { display:inline-flex; align-items:center; gap:6px; margin:0 10px 6px 0; }
+.mp-box input { font:inherit; width:110px; padding:6px 9px; border:1.5px solid rgba(76,91,212,.3); border-radius:9px; background:#fff; }
+.mp-btns { display:flex; gap:6px; margin-top:2px; }
+.mp-btns button { border:0; border-radius:10px; padding:7px 12px; font-size:13px; background:rgba(120,90,60,.1); }
+.mp-btns .mp-join { background:#4c5bd4; color:#fff; }
+.mp-msg { margin:6px 0 0; font-size:12.5px; color:#c0321a; line-height:1.45; }
+.mp-msg:empty { display:none; }
+.mp-chip.show { display:flex; align-items:center; gap:8px; margin-top:6px; padding:5px 6px 5px 10px; border-radius:11px; background:#eef0ff; font-size:12.5px; color:#3a44a8; white-space:normal; }
+.mp-chip .mp-leave { margin-left:auto; border:0; border-radius:9px; padding:5px 10px; font-size:12px; background:#fff; color:#4c5bd4; }
+body.mobile .wh-top .wh-mp { margin-left:0; }
+body.mobile .mp-box input { width:96px; }
