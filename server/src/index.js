@@ -22,7 +22,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url), code = String(env.ROOM_CODE || '7703');
     if (url.pathname === '/' || url.pathname === '/health') {
-      return new Response('Gunsan Jelly 함께 걷기 서버가 동작 중이에요.', { headers: { 'content-type': 'text/plain; charset=utf-8' } });
+      return new Response('Gunsan Sea 함께 걷기 서버가 동작 중이에요.', { headers: { 'content-type': 'text/plain; charset=utf-8' } });
     }
     const m = url.pathname.match(/^\/room\/(\d{4,6})$/);
     if (!m || m[1] !== code) return new Response('Not found', { status: 404 });   // 정해진 방 코드만

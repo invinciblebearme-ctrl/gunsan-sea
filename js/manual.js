@@ -69,7 +69,7 @@ const SECTIONS = [
 
 export function setupManual() {
   const box = el('section', 'quiz manual', `<button type="button" class="pc-x" aria-label="닫기">✕</button>
-    <h3>📖 Gunsan Jelly 사용 설명서</h3><p class="mn-lead">궁금한 항목을 눌러 펼쳐 보세요.</p>
+    <h3>📖 Gunsan Sea 사용 설명서</h3><p class="mn-lead">궁금한 항목을 눌러 펼쳐 보세요.</p>
     <div class="mn-list">${SECTIONS.map(([t, h], i) => `<details${i === 0 ? ' open' : ''}><summary>${t}</summary>${h}</details>`).join('')}</div>`);
   box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', '사용 설명서'); document.body.appendChild(box);
   const open = () => { box.classList.add('show'); document.body.classList.add('quiz-open'); document.body.classList.remove('panel-open'); };
