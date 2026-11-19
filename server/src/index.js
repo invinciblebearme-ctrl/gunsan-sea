@@ -5,7 +5,7 @@
 //      (설정: server 폴더에서  npx wrangler secret put TEACHER_KEY)
 //  · 열린 방은 선생님이 닫거나 3시간이 지나면 닫힘 → 들어와 있던 학생도 모두 나가게 됨
 //
-//  접속: wss://<이 Worker 주소>/room/7703?name=<별명>&model=<boy|girl>[&role=teacher]
+//  접속: wss://<이 Worker 주소>/room/7703?name=<별명>&model=<boy|girl>[&role=teacher]  (선생님은 로봇 모델로 고정)
 //  주고받는 말(JSON):
 //    나 → 서버   {t:'auth', key}(선생님만, 접속 직후) · {t:'pos', x,z,y,yaw} · {t:'close'}(선생님만)
 //    서버 → 나   {t:'welcome', id, color, teacher, openUntil, peers:[…]} · {t:'closed'} · {t:'badkey'} · {t:'locked'} · {t:'nokey'} · {t:'full'}
@@ -51,7 +51,7 @@ export class Room {
     const url = new URL(request.url), [client, server] = Object.values(new WebSocketPair());
     this.state.acceptWebSocket(server);
     const teacher = url.searchParams.get('role') === 'teacher';
-    const model = url.searchParams.get('model') === 'girl' ? 'girl' : 'boy';   // 고른 캐릭터 (남학생·여학생)
+    const model = teacher ? 'robot' : url.searchParams.get('model') === 'girl' ? 'girl' : 'boy';   // 학생은 남학생·여학생, 선생님은 항상 로봇
     const a = { id: crypto.randomUUID().slice(0, 8), name: teacher ? '선생님' : cleanName(url.searchParams.get('name')), color: '', teacher, model, ok: false,
       x: 0, z: 0, y: 0, yaw: 0, has: false, win: 0, n: 0 };
     server.serializeAttachment(a);

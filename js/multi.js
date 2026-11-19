@@ -11,7 +11,8 @@ const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls)
 const EYE = 0.075, SEND_HZ = 8;
 // 캐릭터 모델: 키 약 1.35~1.48 → 장면 속 사람 크기(약 0.09~0.1)로 줄임. 발밑이 원점, 앞이 +z
 export const MODELS = { boy: { label: '남학생', file: 'assets/models/student-boy.glb', thumb: 'assets/models/student-boy.png' },
-  girl: { label: '여학생', file: 'assets/models/student-girl.glb', thumb: 'assets/models/student-girl.png' } };
+  girl: { label: '여학생', file: 'assets/models/student-girl.glb', thumb: 'assets/models/student-girl.png' },
+  robot: { label: '선생님 로봇', file: 'assets/models/teacher-robot.glb', thumb: 'assets/models/teacher-robot.png', teacher: true } };   // 선생님은 고르지 않고 로봇으로 들어감
 const MODEL_SCALE = 0.068, TAG_Y = 0.13;
 const loader = new GLTFLoader(), cache = {};
 const loadModel = kind => (cache[kind] ||= loader.loadAsync(MODELS[kind].file).then(g => {
@@ -29,13 +30,12 @@ function nameTag(text, color) {   // 머리 위 별명표 (캔버스 글자 → 
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthWrite: false, fog: false }));
   s.scale.set(0.16, 0.045, 1); s.position.y = TAG_Y; s.renderOrder = 5; return s;
 }
-function avatar(name, color, teacher, kind) {   // 고른 학생 모델 + 별명표 (선생님은 👑). 모델을 불러오는 동안은 간단한 캐릭터
+function avatar(name, color, teacher, kind) {   // 고른 학생 모델(선생님은 로봇) + 별명표. 모델을 불러오는 동안은 간단한 캐릭터
   const g = new THREE.Group(), stand = placeholder(color);
   g.add(stand);
-  if (teacher) { const crown = new THREE.Mesh(new THREE.ConeGeometry(0.012, 0.014, 5), new THREE.MeshStandardMaterial({ color: 0xffd43b, emissive: 0xffb300, emissiveIntensity: 0.4 })); crown.position.y = TAG_Y - 0.03; g.add(crown); }
   g.add(nameTag(teacher ? '👑 ' + name : name, color));
   const rig = { g, mixer: null, acts: {}, cur: '' };
-  loadModel(MODELS[kind] ? kind : 'boy').then(gl => {
+  loadModel(teacher ? 'robot' : MODELS[kind] && !MODELS[kind].teacher ? kind : 'boy').then(gl => {
     const m = gl.scene.clone(true); m.scale.setScalar(MODEL_SCALE); g.remove(stand); g.add(m);
     rig.mixer = new THREE.AnimationMixer(m);
     for (const clip of gl.animations) rig.acts[clip.name] = rig.mixer.clipAction(clip);
@@ -64,12 +64,13 @@ export function setupMulti({ walk, root }) {
   const btn = el('button', 'wh-mp', '👥 함께 걷기'); btn.type = 'button';
   const top = document.querySelector('.walk-hud .wh-top'); top.insertBefore(btn, top.querySelector('.wh-tour'));
   const box = el('div', 'mp-box', `<b>👥 함께 걷기</b>
-    <p class="mp-lead">선생님이 연 <b>방 ${MP_ROOM}</b>에 들어가면 친구들이 서로 보여요. 이름 대신 <b>별명</b>을 써요.</p>
-    <div class="mp-pick" role="radiogroup" aria-label="캐릭터 고르기"><span>캐릭터</span>${Object.entries(MODELS).map(([k, m]) =>
+    <p class="mp-lead">선생님이 방을 열면 들어가서 친구들과 함께 걸을 수 있어요. 이름 대신 <b>별명</b>을 써요.</p>
+    <div class="mp-pick" role="radiogroup" aria-label="캐릭터 고르기"><span>캐릭터</span>${Object.entries(MODELS).filter(([, m]) => !m.teacher).map(([k, m]) =>
       `<label class="mp-kind"><input type="radio" name="mp-kind" value="${k}"><img src="${m.thumb}" alt="" width="40" height="40"><b>${m.label}</b></label>`).join('')}</div>
     <label>별명 <input class="mp-nick" maxlength="8" placeholder="예: 바다3" autocomplete="off"></label>
     <div class="mp-btns"><button type="button" class="mp-join">들어가기</button><button type="button" class="mp-close">닫기</button></div>
     <details class="mp-t"><summary>선생님이신가요? 방 열기</summary>
+      <p class="mp-robot"><img src="${MODELS.robot.thumb}" alt="" width="40" height="40"><span>선생님은 <b>로봇 캐릭터</b>로 들어가요.</span></p>
       <label>선생님 비밀번호 <input class="mp-key" type="password" maxlength="64" autocomplete="off"></label>
       <p class="mp-note">비밀번호 칸은 한글이 입력되지 않아요. 영문·숫자로 정한 비밀번호를 넣어 주세요.</p>
       <div class="mp-btns"><button type="button" class="mp-open">방 열기</button></div>
@@ -78,9 +79,9 @@ export function setupMulti({ walk, root }) {
   const chip = el('div', 'mp-chip', '<span class="mp-info"></span><button type="button" class="mp-shut" hidden>방 닫기</button><button type="button" class="mp-leave">나가기</button>');
   document.querySelector('.walk-hud').append(box, chip);
   const q = s => box.querySelector(s), msg = t => { q('.mp-msg').textContent = t; };
-  try { const s = JSON.parse(localStorage.getItem('gunsan-jelly-mp') || '{}'); q('.mp-nick').value = s.nick || ''; if (MODELS[s.kind]) { kind = s.kind; q(`input[value="${kind}"]`).checked = true; } } catch (e) { /* 무시 */ }   // 비밀번호는 저장하지 않음
+  try { const s = JSON.parse(localStorage.getItem('gunsan-jelly-mp') || '{}'); q('.mp-nick').value = s.nick || ''; if (MODELS[s.kind] && !MODELS[s.kind].teacher) { kind = s.kind; q(`input[value="${kind}"]`).checked = true; } } catch (e) { /* 무시 */ }   // 비밀번호는 저장하지 않음
   box.querySelectorAll('input[name="mp-kind"]').forEach(r => r.onchange = () => { kind = r.value; loadModel(kind).catch(() => {}); });
-  const needKind = () => { if (MODELS[kind]) return false; msg('남학생 또는 여학생 캐릭터를 골라 주세요.'); return true; };
+  const needKind = () => { if (MODELS[kind] && !MODELS[kind].teacher) return false; msg('남학생 또는 여학생 캐릭터를 골라 주세요.'); return true; };
 
   btn.onclick = () => {
     if (document.pointerLockElement) document.exitPointerLock?.();
@@ -98,9 +99,8 @@ export function setupMulti({ walk, root }) {
   };
   q('.mp-open').onclick = () => {
     const k = q('.mp-key').value.trim();
-    if (needKind()) return;
     if (!k) return msg('선생님 비밀번호를 넣어 주세요.');
-    try { localStorage.setItem('gunsan-jelly-mp', JSON.stringify({ nick: q('.mp-nick').value.trim(), kind })); } catch (e) { /* 무시 */ }
+    loadModel('robot').catch(() => {});
     if (!server) return msg('아직 함께 걷기 서버가 연결되지 않았어요.');
     nick = '선생님'; isTeacher = true; key = k; retry = 0; wantOpen = true; connect();
   };
@@ -109,7 +109,7 @@ export function setupMulti({ walk, root }) {
 
   function connect() {
     closedByMe = false; msg('연결하는 중…');
-    try { ws = new WebSocket(`${server}/room/${room}?name=${encodeURIComponent(nick)}&model=${kind}${isTeacher ? '&role=teacher' : ''}`); }
+    try { ws = new WebSocket(`${server}/room/${room}?name=${encodeURIComponent(nick)}&model=${isTeacher ? 'robot' : kind}${isTeacher ? '&role=teacher' : ''}`); }
     catch (e) { msg('이 화면에서는 함께 걷기를 쓸 수 없어요. 실제 사이트에서 써 주세요.'); wantOpen = false; return; }
     ws.onopen = () => { if (isTeacher) ws.send(JSON.stringify({ t: 'auth', key })); };   // 비밀번호는 주소가 아니라 첫 메시지로
     ws.onmessage = e => { let d; try { d = JSON.parse(e.data); } catch (err) { return; } on(d); };
@@ -121,7 +121,7 @@ export function setupMulti({ walk, root }) {
     };
   }
   function on(d) {
-    if (d.t === 'welcome') { me = d.id; retry = 0; lastSent = null; openUntil = d.openUntil || 0; q('.mp-key').value = '';   /* 비밀번호는 다시 연결용으로 메모리에만 두고 저장하지 않음 */ box.classList.remove('show'); msg(''); for (const p of d.peers) upsert(p, true); render(isTeacher ? `방 ${room}을 열었어요` : ''); }
+    if (d.t === 'welcome') { me = d.id; retry = 0; lastSent = null; openUntil = d.openUntil || 0; q('.mp-key').value = '';   /* 비밀번호는 다시 연결용으로 메모리에만 두고 저장하지 않음 */ box.classList.remove('show'); msg(''); for (const p of d.peers) upsert(p, true); render(isTeacher ? '방을 열었어요' : ''); }
     else if (d.t === 'closed' || d.t === 'badkey' || d.t === 'locked' || d.t === 'nokey') {
       wantOpen = false; box.classList.add('show');
       if (d.t === 'closed') { q('.mp-t').open = false; msg(d.by === 'teacher' ? '선생님이 방을 닫았어요. 함께 걷기를 마쳤어요.' : d.by === 'time' ? '방이 열린 지 3시간이 지나 닫혔어요.' : '선생님이 아직 방을 열지 않았어요. 선생님이 방을 열면 다시 들어가기를 눌러 주세요.'); }
@@ -132,7 +132,7 @@ export function setupMulti({ walk, root }) {
     else if (d.t === 'join') { upsert(d, false); render(`👋 ${d.name} 님이 들어왔어요`); }
     else if (d.t === 'pos') upsert(d, !peers.get(d.id)?.seen);
     else if (d.t === 'leave') { const p = peers.get(d.id); if (p) { root.remove(p.rig.g); peers.delete(d.id); render(`${p.name} 님이 나갔어요`); } }
-    else if (d.t === 'full') { wantOpen = false; box.classList.add('show'); msg('방이 꽉 찼어요 (최대 40명). 다른 방 코드를 써 주세요.'); }
+    else if (d.t === 'full') { wantOpen = false; box.classList.add('show'); msg('방이 꽉 찼어요 (최대 40명). 선생님께 알려 주세요.'); }
   }
   function upsert(d, snap) {
     let p = peers.get(d.id);
@@ -150,7 +150,7 @@ export function setupMulti({ walk, root }) {
     chip.classList.toggle('show', !!me);
     btn.classList.toggle('on', !!me);
     const until = openUntil ? new Date(openUntil).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit' }) : '';
-    chip.querySelector('.mp-info').textContent = me ? `${isTeacher ? `👑 선생님 · 방 ${room} 열림${until ? ` (${until}까지)` : ''}` : `👥 방 ${room} · ${nick}`}${MODELS[kind] ? ` (${MODELS[kind].label})` : ''} · 모두 ${peers.size + 1}명${noteT > 0 ? ` · ${note}` : ''}` : '';
+    chip.querySelector('.mp-info').textContent = me ? `${isTeacher ? `👑 선생님 (로봇) · 방 열림${until ? ` (${until}까지)` : ''}` : `👥 함께 걷기 · ${nick}${MODELS[kind] ? ` (${MODELS[kind].label})` : ''}`} · 모두 ${peers.size + 1}명${noteT > 0 ? ` · ${note}` : ''}` : '';
     chip.querySelector('.mp-shut').hidden = !(me && isTeacher);
   }
   function leave() { wantOpen = false; closedByMe = true; key = ''; try { ws?.close(1000, 'leave'); } catch (e) { /* 무시 */ } ws = null; me = null; clearPeers(); render(); }
