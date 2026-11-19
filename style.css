@@ -478,3 +478,13 @@ body.mobile .mp-box input { width:96px; }
 .mp-chip .mp-shut { margin-left:auto; border:0; border-radius:9px; padding:5px 10px; font-size:12px; background:#f2b705; color:#3a2a00; }
 .mp-chip .mp-shut + .mp-leave { margin-left:4px; }
 .mp-chip .mp-shut[hidden] + .mp-leave { margin-left:auto; }
+/* 함께 걷기: 캐릭터 고르기 (남학생·여학생 작은 그림) */
+.mp-pick { display:flex; align-items:center; gap:8px; margin:0 0 8px; flex-wrap:wrap; }
+.mp-pick > span { font-size:13px; }
+.mp-kind { display:inline-flex !important; align-items:center; gap:6px; margin:0 !important; padding:4px 10px 4px 4px; border-radius:12px; border:2px solid rgba(76,91,212,.2); background:#fff; cursor:pointer; }
+.mp-kind input { position:absolute; opacity:0; pointer-events:none; }
+.mp-kind img { width:40px; height:40px; border-radius:9px; background:#eef0ff; object-fit:contain; }
+.mp-kind b { font-weight:400; font-size:13px; }
+.mp-kind:has(input:checked) { border-color:#4c5bd4; background:#eef0ff; box-shadow:0 0 0 2px rgba(76,91,212,.15); }
+.mp-kind:has(input:focus-visible) { outline:2px solid #4c5bd4; outline-offset:2px; }
+.mp-chip button { white-space:nowrap; flex:none; }

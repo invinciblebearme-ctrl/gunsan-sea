@@ -5,7 +5,7 @@
 //      (설정: server 폴더에서  npx wrangler secret put TEACHER_KEY)
 //  · 열린 방은 선생님이 닫거나 3시간이 지나면 닫힘 → 들어와 있던 학생도 모두 나가게 됨
 //
-//  접속: wss://<이 Worker 주소>/room/7703?name=<별명>[&role=teacher]
+//  접속: wss://<이 Worker 주소>/room/7703?name=<별명>&model=<boy|girl>[&role=teacher]
 //  주고받는 말(JSON):
 //    나 → 서버   {t:'auth', key}(선생님만, 접속 직후) · {t:'pos', x,z,y,yaw} · {t:'close'}(선생님만)
 //    서버 → 나   {t:'welcome', id, color, teacher, openUntil, peers:[…]} · {t:'closed'} · {t:'badkey'} · {t:'locked'} · {t:'nokey'} · {t:'full'}
@@ -51,7 +51,8 @@ export class Room {
     const url = new URL(request.url), [client, server] = Object.values(new WebSocketPair());
     this.state.acceptWebSocket(server);
     const teacher = url.searchParams.get('role') === 'teacher';
-    const a = { id: crypto.randomUUID().slice(0, 8), name: teacher ? '선생님' : cleanName(url.searchParams.get('name')), color: '', teacher, ok: false,
+    const model = url.searchParams.get('model') === 'girl' ? 'girl' : 'boy';   // 고른 캐릭터 (남학생·여학생)
+    const a = { id: crypto.randomUUID().slice(0, 8), name: teacher ? '선생님' : cleanName(url.searchParams.get('name')), color: '', teacher, model, ok: false,
       x: 0, z: 0, y: 0, yaw: 0, has: false, win: 0, n: 0 };
     server.serializeAttachment(a);
     if (!teacher) {   // 학생: 방이 열려 있을 때만 들어올 수 있음
@@ -69,7 +70,7 @@ export class Room {
     a.color = a.teacher ? TEACHER_COLOR : (COLORS.find(c => !used.has(c)) || COLORS[others.length % COLORS.length]);
     a.ok = true; ws.serializeAttachment(a);
     this.send(ws, { t: 'welcome', id: a.id, color: a.color, teacher: a.teacher, openUntil: await this.openUntil(), peers: others.filter(p => p.a.has).map(p => pub(p.a)) });
-    this.broadcast({ t: 'join', id: a.id, name: a.name, color: a.color, teacher: a.teacher }, ws);
+    this.broadcast({ t: 'join', id: a.id, name: a.name, color: a.color, teacher: a.teacher, model: a.model }, ws);
   }
 
   async webSocketMessage(ws, msg) {
@@ -122,4 +123,4 @@ export class Room {
     for (const p of this.peers()) { if (p.ws === except || !p.a.ok) continue; try { p.ws.send(s); } catch (e) { /* close 에서 정리 */ } }
   }
 }
-const pub = a => ({ id: a.id, name: a.name, color: a.color, teacher: a.teacher, x: +a.x.toFixed(3), z: +a.z.toFixed(3), y: +a.y.toFixed(3), yaw: +a.yaw.toFixed(3) });
+const pub = a => ({ id: a.id, name: a.name, color: a.color, teacher: a.teacher, model: a.model, x: +a.x.toFixed(3), z: +a.z.toFixed(3), y: +a.y.toFixed(3), yaw: +a.yaw.toFixed(3) });
