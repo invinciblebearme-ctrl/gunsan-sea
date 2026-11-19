@@ -105,6 +105,8 @@
 - 서버: `server/` 폴더 (Cloudflare Worker + Durable Object, 방 코드마다 방 하나).
 - **확인용 아티팩트 페이지에서는 동작하지 않음**(외부 연결 차단). 실제 사이트에서만 됨.
 
+**배포된 서버**: `https://gunsan-sea-mp.invinciblebearme.workers.dev` (Worker 이름 `gunsan-sea-mp`, `js/net-config.js` 에 `wss://` 로 설정됨)
+
 **함께 걷기 서버 배포 (한 번만)**
 1. 컴퓨터에 Node.js 설치 → 이 저장소를 내려받은 뒤 `server` 폴더에서 `npm install`
 2. `npx wrangler login` (Cloudflare 계정으로 로그인)
