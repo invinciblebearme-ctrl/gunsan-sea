@@ -1,0 +1,7 @@
+{
+  "name": "gunsan-sea-mp",
+  "private": true,
+  "description": "Gunsan Jelly 함께 걷기 서버 (Cloudflare Worker + Durable Object)",
+  "scripts": { "dev": "wrangler dev", "deploy": "wrangler deploy" },
+  "devDependencies": { "wrangler": "^4" }
+}

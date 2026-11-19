@@ -95,6 +95,32 @@
   걷는 중 Esc는 열린 카드만 닫음, 쓸 수 없는 카드 버튼(가까이 보기·물때 바꿔 보기) 숨김, 위쪽에 🌊 물때 조절 추가.
 - 새 파일: `js/walk.js` / 바뀐 파일: `js/main.js`(걷는 동안 기존 조작 끄기), `js/world.js`(다리·도로 정보), `style.css`
 
+### 👥 함께 걷기 (`multiplayer` 브랜치)
+- **방 코드는 7703 하나로 고정**, 방은 **선생님만** 열 수 있음 (선생님 비밀번호 = 서버 비밀값 `TEACHER_KEY`, 화면 코드에는 없음).
+  선생님이 방을 열면 학생은 별명만 넣고 들어감. 열리기 전엔 "선생님이 아직 방을 열지 않았어요".
+  선생님이 **방 닫기**를 누르거나 3시간이 지나면 닫히고 모두 나가게 됨. 비밀번호 5번 틀리면 1분 잠금.
+- 들어갈 때 **남학생·여학생 캐릭터**를 고름(작은 그림 표시, 브라우저에 기억). 친구 화면에는 고른 모델이 보이고
+  움직이는 빠르기에 따라 서기(Idle)·걷기(Walk)·뛰기(Run) 동작을 함.
+  선생님은 고르지 않고 **로봇 캐릭터**(`assets/models/teacher-robot.glb`)로 바로 들어가고 👑 + 노란 별명표 (서버가 선생님만 로봇으로 정함).
+- 게임 화면에는 방 코드(7703)를 보여 주지 않음 (연결할 때만 안에서 씀).
+  모델: `assets/models/student-boy.glb`, `student-girl.glb` (+ 고르기용 그림 `.png`).
+- 내 위치를 1초에 8번까지 보내고, 친구 캐릭터는 부드럽게 따라 움직임. 들어오고 나가면 알림.
+- 개인정보: 별명만(최대 8자, 기호 제거), 위치 저장 안 함, 모두 나가면 방이 사라짐. 방 최대 40명, 너무 잦은 메시지는 무시.
+- 서버: `server/` 폴더 (Cloudflare Worker + Durable Object, 방 코드마다 방 하나).
+- **확인용 아티팩트 페이지에서는 동작하지 않음**(외부 연결 차단). 실제 사이트에서만 됨.
+
+**배포된 서버**: `https://gunsan-sea-mp.invinciblebearme.workers.dev` (Worker 이름 `gunsan-sea-mp`, `js/net-config.js` 에 `wss://` 로 설정됨)
+
+**함께 걷기 서버 배포 (한 번만)**
+1. 컴퓨터에 Node.js 설치 → 이 저장소를 내려받은 뒤 `server` 폴더에서 `npm install`
+2. `npx wrangler login` (Cloudflare 계정으로 로그인)
+3. `npx wrangler deploy` → 나오는 주소(예: `https://gunsan-sea-mp.<계정>.workers.dev`) 확인
+3-1. `npx wrangler secret put TEACHER_KEY` → 선생님 비밀번호 입력 (학생이 알 수 없는 것으로, 나중에 같은 명령으로 바꿀 수 있음)
+4. `js/net-config.js` 의 `MP_SERVER` 에 그 주소를 `wss://` 로 바꿔 적고 저장 → 사이트 다시 올리기
+   (예: `export const MP_SERVER = 'wss://gunsan-sea-mp.<계정>.workers.dev';`)
+- 시험할 때는 사이트 주소 뒤에 `?mp=wss://...` 를 붙여 다른 서버를 쓸 수 있음.
+- 방 코드를 바꾸려면 `server/wrangler.toml` 의 `ROOM_CODE` 와 `js/net-config.js` 의 `MP_ROOM` 을 같이 바꿈.
+
 ## 파일 안내
 
 | 파일 | 하는 일 |
@@ -111,6 +137,8 @@
 | `js/record.js` | 나의 학습 기록 |
 | `js/manual.js` | 사용 설명서 |
 | `js/walk.js` | 걸어서 탐방 (1인칭 걷기 · 자동 탐방 · 배) |
+| `js/multi.js`, `js/net-config.js` | 👥 함께 걷기 (화면 쪽) · 서버 주소 설정 |
+| `server/` | 👥 함께 걷기 서버 (Cloudflare Worker + Durable Object) |
 
 ## 수업 전에 확인해 주세요
 

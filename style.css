@@ -447,3 +447,47 @@ body.walking .place-card .pc-go, body.walking .place-card .pc-tide { display:non
 .wh-safe b { font-weight:400; color:#c0321a; }
 .wh-safe[hidden] { display:none; }
 body.mobile .wh-tide input { max-width:none; }
+
+/* 👥 함께 걷기 */
+.wh-mp { border:0; border-radius:11px; padding:6px 10px; font-size:13px; background:#eef0ff; color:#4c5bd4; }
+.wh-mp.on { background:#4c5bd4; color:#fff; }
+.wh-top .wh-mp { margin-left:auto; }
+.wh-top .wh-mp + .wh-tour { margin-left:4px; }
+.mp-box, .mp-chip { display:none; }
+.mp-box.show { display:block; margin-top:8px; padding:10px 12px; border-radius:14px; background:#f4f5ff; white-space:normal; max-width:520px; font-size:13px; }
+.mp-box > b { font-weight:400; font-size:14px; color:#4c5bd4; }
+.mp-lead { margin:3px 0 8px; color:#5c5148; line-height:1.5; }
+.mp-lead b { font-weight:400; color:#2b2622; }
+.mp-box label { display:inline-flex; align-items:center; gap:6px; margin:0 10px 6px 0; }
+.mp-box input { font:inherit; width:110px; padding:6px 9px; border:1.5px solid rgba(76,91,212,.3); border-radius:9px; background:#fff; }
+.mp-btns { display:flex; gap:6px; margin-top:2px; }
+.mp-btns button { border:0; border-radius:10px; padding:7px 12px; font-size:13px; background:rgba(120,90,60,.1); }
+.mp-btns .mp-join { background:#4c5bd4; color:#fff; }
+.mp-msg { margin:6px 0 0; font-size:12.5px; color:#c0321a; line-height:1.45; }
+.mp-msg:empty { display:none; }
+.mp-chip.show { display:flex; align-items:center; gap:8px; margin-top:6px; padding:5px 6px 5px 10px; border-radius:11px; background:#eef0ff; font-size:12.5px; color:#3a44a8; white-space:normal; }
+.mp-chip .mp-leave { margin-left:auto; border:0; border-radius:9px; padding:5px 10px; font-size:12px; background:#fff; color:#4c5bd4; }
+body.mobile .wh-top .wh-mp { margin-left:0; }
+body.mobile .mp-box input { width:96px; }
+.mp-t { margin-top:10px; padding-top:8px; border-top:1px dashed rgba(76,91,212,.25); }
+.mp-t summary { cursor:pointer; font-size:12.5px; color:#8b7e70; }
+.mp-t[open] summary { color:#b07800; margin-bottom:6px; }
+.mp-t .mp-key { width:150px; }
+.mp-t .mp-open { background:#f2b705; color:#3a2a00; }
+.mp-note { margin:6px 0 0; font-size:11.5px; color:#8b7e70; line-height:1.45; }
+.mp-chip .mp-shut { margin-left:auto; border:0; border-radius:9px; padding:5px 10px; font-size:12px; background:#f2b705; color:#3a2a00; }
+.mp-chip .mp-shut + .mp-leave { margin-left:4px; }
+.mp-chip .mp-shut[hidden] + .mp-leave { margin-left:auto; }
+/* 함께 걷기: 캐릭터 고르기 (남학생·여학생 작은 그림) */
+.mp-pick { display:flex; align-items:center; gap:8px; margin:0 0 8px; flex-wrap:wrap; }
+.mp-pick > span { font-size:13px; }
+.mp-kind { display:inline-flex !important; align-items:center; gap:6px; margin:0 !important; padding:4px 10px 4px 4px; border-radius:12px; border:2px solid rgba(76,91,212,.2); background:#fff; cursor:pointer; }
+.mp-kind input { position:absolute; opacity:0; pointer-events:none; }
+.mp-kind img { width:40px; height:40px; border-radius:9px; background:#eef0ff; object-fit:contain; }
+.mp-kind b { font-weight:400; font-size:13px; }
+.mp-kind:has(input:checked) { border-color:#4c5bd4; background:#eef0ff; box-shadow:0 0 0 2px rgba(76,91,212,.15); }
+.mp-kind:has(input:focus-visible) { outline:2px solid #4c5bd4; outline-offset:2px; }
+.mp-chip button { white-space:nowrap; flex:none; }
+.mp-robot { display:flex; align-items:center; gap:8px; margin:0 0 8px; font-size:12.5px; color:#5c5148; }
+.mp-robot img { width:40px; height:40px; border-radius:9px; background:#fff6d6; object-fit:contain; }
+.mp-robot b { font-weight:400; color:#b07800; }
