@@ -29,6 +29,11 @@
 | 걷기 2~4 | 다리 위 걷기 · 장소 알림·자동 탐방 · 배 타기 | `06613ea` | `backup/walk-2-4-bridge-tour-ferry` |
 | 걷기 수정 | 교통안전 안내 · Esc·카드 버튼·물때 조절 | `11338dd` | `backup/walk-fix-safety` |
 | 걷기 합치기 전 | 걸어서 탐방을 넣기 전 main | `0e8af23` | `backup/main-before-walk-mode` |
+| 함께 걷기 1 | 같은 방에서 함께 걷기 | `cc9fb43` | `backup/mp-1-walk-together` |
+| 함께 걷기 2 | 방 코드 고정 · 선생님만 방 열기 | `bd885d9` | `backup/mp-2-teacher-room` |
+| 함께 걷기 3 | 남학생·여학생 캐릭터 고르기 | `1bd6d12` | `backup/mp-3-student-models` |
+| 함께 걷기 4 | 선생님 로봇 · 화면에서 방 코드 숨김 | `92f35ce` | `backup/mp-4-teacher-robot` |
+| 함께 걷기 합치기 전 | 함께 걷기를 넣기 전 main | `0b93853` | `backup/main-before-multiplayer` |
 
 > 이 저장소는 처음에 `gunsan-3d` 저장소의 `gunsan-jelly/` 폴더에서 만들었다가, 커밋 기록을 그대로 살려 옮겨 온 것이에요.
 > 그래서 커밋 메시지에 나오는 `gunsan-jelly/` 폴더는 이 저장소의 맨 위 폴더와 같아요.
@@ -95,7 +100,7 @@
   걷는 중 Esc는 열린 카드만 닫음, 쓸 수 없는 카드 버튼(가까이 보기·물때 바꿔 보기) 숨김, 위쪽에 🌊 물때 조절 추가.
 - 새 파일: `js/walk.js` / 바뀐 파일: `js/main.js`(걷는 동안 기존 조작 끄기), `js/world.js`(다리·도로 정보), `style.css`
 
-### 👥 함께 걷기 (`multiplayer` 브랜치)
+### 👥 함께 걷기
 - **방 코드는 7703 하나로 고정**, 방은 **선생님만** 열 수 있음 (선생님 비밀번호 = 서버 비밀값 `TEACHER_KEY`, 화면 코드에는 없음).
   선생님이 방을 열면 학생은 별명만 넣고 들어감. 열리기 전엔 "선생님이 아직 방을 열지 않았어요".
   선생님이 **방 닫기**를 누르거나 3시간이 지나면 닫히고 모두 나가게 됨. 비밀번호 5번 틀리면 1분 잠금.
