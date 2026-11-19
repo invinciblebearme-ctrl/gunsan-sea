@@ -42,7 +42,8 @@ export function setupMulti({ walk, root }) {
     <div class="mp-btns"><button type="button" class="mp-join">들어가기</button><button type="button" class="mp-close">닫기</button></div>
     <details class="mp-t"><summary>선생님이신가요? 방 열기</summary>
       <label>선생님 비밀번호 <input class="mp-key" type="password" maxlength="64" autocomplete="off"></label>
-      <div class="mp-btns"><button type="button" class="mp-open">방 ${MP_ROOM} 열기</button></div>
+      <p class="mp-note">비밀번호 칸은 한글이 입력되지 않아요. 영문·숫자로 정한 비밀번호를 넣어 주세요.</p>
+      <div class="mp-btns"><button type="button" class="mp-open">방 열기</button></div>
       <p class="mp-note">방을 열면 학생들이 들어올 수 있어요. 수업이 끝나면 ‘방 닫기’를 눌러 주세요. (잊어도 3시간 뒤 저절로 닫혀요)</p></details>
     <p class="mp-msg" aria-live="polite"></p>`);
   const chip = el('div', 'mp-chip', '<span class="mp-info"></span><button type="button" class="mp-shut" hidden>방 닫기</button><button type="button" class="mp-leave">나가기</button>');
@@ -64,7 +65,7 @@ export function setupMulti({ walk, root }) {
     nick = n; isTeacher = false; key = ''; retry = 0; wantOpen = true; connect();
   };
   q('.mp-open').onclick = () => {
-    const k = q('.mp-key').value;
+    const k = q('.mp-key').value.trim();
     if (!k) return msg('선생님 비밀번호를 넣어 주세요.');
     if (!server) return msg('아직 함께 걷기 서버가 연결되지 않았어요.');
     nick = '선생님'; isTeacher = true; key = k; retry = 0; wantOpen = true; connect();

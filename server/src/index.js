@@ -83,7 +83,7 @@ export class Room {
     if (d.t === 'auth' && a.teacher && !a.ok) {
       if (!this.env.TEACHER_KEY) return this.bye(ws, { t: 'nokey' }, 'no teacher key');
       if (now < this.lockUntil) return this.bye(ws, { t: 'locked' }, 'locked');
-      if (!(await sameKey(d.key, this.env.TEACHER_KEY))) {
+      if (!(await sameKey(String(d.key || '').normalize('NFC').trim(), String(this.env.TEACHER_KEY).normalize('NFC').trim()))) {   // 앞뒤 빈칸은 무시
         if (++this.fails >= LOCK_FAILS) { this.fails = 0; this.lockUntil = now + LOCK_MS; }
         return this.bye(ws, { t: 'badkey' }, 'bad key');
       }
